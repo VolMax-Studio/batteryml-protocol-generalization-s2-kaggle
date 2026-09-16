@@ -169,7 +169,7 @@ after ratification. No neural model is part of S2.
 
 - Private Kaggle CPU kernel; internet disabled; GPU disabled.
 - Python exactly `3.12.13`.
-- Linux x86_64; at least `31 GiB` total RAM (`mem_total_bytes >= 31 GiB`). Hardware admission evaluates `/proc/meminfo MemTotal` (observed: 31.35 GiB / 33,659,383,808 bytes). The container cgroup memory limit (`memory.max`) in Kaggle CPU containers is tracked (observed: 30.00 GiB / 32,212,254,720 bytes), providing >3.5x headroom over the peak ~8 GiB preprocessing and ~4 GiB training workloads.
+- Linux x86_64; at least `31 GiB` total RAM (`mem_total_bytes >= 31 GiB`). Hardware admission evaluates `/proc/meminfo MemTotal` (observed: 31.35 GiB / 33,659,383,808 bytes). The container cgroup memory limit (`memory.max`) in Kaggle CPU containers is tracked (observed: 30.00 GiB / 32,212,254,720 bytes).
 - **CPU admission**: Exactly **4 logical CPU cores** required (`logical_cpus == 4`). Hosts with core counts different from 4 fail admission closed. This requirement freezes XGBoost threading semantics without altering upstream BatteryML code.
 - **Memory tracking**: Both `/proc/meminfo MemTotal` and cgroup memory limit (`memory.max` under cgroup v2, or `memory.limit_in_bytes` under cgroup v1) are recorded in the environment receipt.
 - Kaggle base `pip freeze` SHA-256 exactly
