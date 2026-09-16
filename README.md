@@ -50,6 +50,9 @@ Trigger 3 is pre-exposed and carries no independent confirmatory weight because 
 - `determinism-receipt.json` — pre-run synthetic fixture determinism verification (`rename -> rerun -> byte-identical match`).
 - `l0-provenance-receipt.json` — official TRI/MATR CC BY 4.0 provenance and licensing receipt.
 - `environment-resource-receipt.json` — hardware admission (exact 4 CPUs, cgroup limit tracking, frozen XGBoost parameters).
+- `post-run-binding-feasibility-receipt.json` — pre-run proof that an explicit
+  Kaggle dataset version can be downloaded and reduced to the same canonical
+  content-listing format used by the runtime runner.
 - `batteryml-protocol-generalization-split-manifest.csv` — frozen assignments.
 - `batteryml-source-files.sha256` — pinned BatteryML source manifest.
 
@@ -60,7 +63,9 @@ Raw HDF5 inputs, private Kaggle dataset material, credentials, and S1 local scra
 The Kaggle runner has no pre-created authorization sidecar. At runtime it records
 the unique ratification receipt, frozen governing hashes, mount paths, and a
 canonical full-file SHA-256 listing of the mounted control dataset. Kernel and
-control-dataset version numbers are queried through the Kaggle API only after the
-run. The exact downloaded dataset version must reproduce the runtime listing
-byte-for-byte before any scientific verdict is accepted. The full fail-closed
-procedure is frozen in `PREREGISTRATION.md` under **Post-run Kaggle identity binding**.
+control-dataset versions are enumerated through the Kaggle API only after the run.
+At least one explicitly downloaded version must reproduce the runtime listing
+byte-for-byte before any scientific verdict is accepted. Transient API failure
+leaves binding pending and does not authorize or require a scientific rerun. The
+full fail-closed procedure is frozen in `PREREGISTRATION.md` under **Post-run
+Kaggle identity binding**.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -125,6 +126,15 @@ class ExecutionRunnerStaticTests(unittest.TestCase):
         self.assertNotIn('os.environ["KAGGLE_URL"]', source)
         self.assertNotIn("batteryml-s2-1-execution-run/1", source)
         self.assertIn("POST_RUN_API_BINDING_PENDING", RUNNER.KERNEL_ID_PENDING)
+
+    def test_post_run_binding_feasibility_receipt_is_non_scientific(self) -> None:
+        path = Path(__file__).resolve().parents[1] / "post-run-binding-feasibility-receipt.json"
+        receipt = json.loads(path.read_text())
+        self.assertEqual(receipt["status"], "PASS_CONTENT_BINDING_FEASIBLE")
+        self.assertFalse(receipt["scientific_run_executed"])
+        self.assertEqual(receipt["explicit_version_download"]["exit_code"], 0)
+        self.assertEqual(receipt["explicit_version_download"]["canonical_listing_file_count"], 223)
+        self.assertEqual(len(receipt["explicit_version_download"]["canonical_listing_sha256"]), 64)
 
 
 if __name__ == "__main__":

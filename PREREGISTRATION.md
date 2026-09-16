@@ -222,18 +222,25 @@ a canonical SHA-256 listing of every regular file in the mounted control root.
 After the run, and before scientific adjudication is accepted, the dispatcher must:
 
 1. query the Kaggle API for the completed kernel slug, version, URL, and status;
-2. query the Kaggle API for the attached control-dataset version;
-3. download that exact dataset version and reproduce the runner's canonical
-   listing (`SHA-256`, two spaces, POSIX relative path, newline; rows sorted by
-   POSIX relative path; symlinks inadmissible);
-4. require byte equality of the reproduced listing and equality of its SHA-256
-   with `control_dataset_listing_sha256` in `EXECUTION_REPORT.json`;
+2. enumerate the published versions of the configured control-dataset slug;
+3. download candidate versions by explicit version number and reproduce the
+   runner's canonical listing for each (`SHA-256`, two spaces, POSIX relative
+   path, newline; rows sorted by POSIX relative path; symlinks inadmissible);
+4. require at least one candidate listing to be byte-identical to the runtime
+   listing and require its SHA-256 to equal `control_dataset_listing_sha256` in
+   `EXECUTION_REPORT.json`. If several published versions have byte-identical
+   content, record the complete sorted set of matching versions; content identity
+   is bound even though the redundant version labels are indistinguishable;
 5. bind the API observations to the execution-report SHA-256, ratification-receipt
    SHA-256, runner SHA-256, and output-file hashes in a post-run binding receipt.
 
-Missing API observations, a non-complete kernel, or any listing/hash mismatch
-produces `EXECUTION_IDENTITY_UNBOUND`; no scientific verdict is permitted and no
-scientific retry is automatically authorized.
+Transient API/download unavailability leaves the binding `PENDING_EXTERNAL_BINDING`
+and may be retried without rerunning any scientific model or consuming an attempt.
+A successfully enumerated dataset with zero content matches, a non-complete kernel,
+or a conclusive output/hash mismatch produces `EXECUTION_IDENTITY_UNBOUND`; no
+scientific verdict is permitted and no scientific retry is automatically authorized.
+Feasibility of explicit-version download and canonical-listing reproduction is
+recorded before freeze in `post-run-binding-feasibility-receipt.json`.
 
 ## Cache, isolation, and membership
 

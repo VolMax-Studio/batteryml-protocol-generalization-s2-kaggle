@@ -1,0 +1,51 @@
+{
+  "api_observation": {
+    "current_version_number": 7,
+    "dataset_ref": "volmax1/batteryml-protocol-generalization-s2-controls",
+    "last_updated": "2026-09-16T19:44:04.423Z",
+    "ready_versions": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "retrieved_at_utc": "2026-09-16T21:26:41Z",
+    "source": "Kaggle authenticated dataset-view API"
+  },
+  "explicit_version_download": {
+    "archive_sha256": "4db224463d943ce6777311a433bf7440c36d82e2f7468759478af547663fd751",
+    "canonical_listing_bytes": 25157,
+    "canonical_listing_file_count": 223,
+    "canonical_listing_sha256": "1fd46b85d24f3b0b64083fda9593ccf36db4fb1ae2b0bbf0966d5633ac5acc3e",
+    "dataset_version": 7,
+    "driver_sha256": "c943e1d52478bbec578ec1d06dcbc84b627f33f3e73e3edd18a38c43dbfc65b9",
+    "exit_code": 0,
+    "preregistration_sha256_in_downloaded_version": "075460a0b8da240ecbaeadc800e6463ee940c5c6ea8e7847103ffabb0cddea61",
+    "ratification_receipt_sha256_in_downloaded_version": "f6abdb3733073e6a5de4caa110f7d9d0f135bd86e5ba2b64963a5dfde9c71ecd",
+    "request": "GET /api/v1/datasets/download/volmax1/batteryml-protocol-generalization-s2-controls?datasetVersionNumber=7",
+    "result": "PASS_EXPLICIT_VERSION_DOWNLOAD_AND_CANONICAL_LISTING"
+  },
+  "failed_kernel_version_probe": {
+    "actual_result": "HTTP 404 returned by curl; no response schema was exposed",
+    "operation": "GET https://www.kaggle.com/api/v1/kernels/view/volmax1/batteryml-s2-1-smoke-test",
+    "remaining_unknown": "Whether a different private Kaggle endpoint can report the historical dataset version attached to smoke kernel v2",
+    "resolution": "Not relied upon; the frozen procedure uses explicit-version content matching instead"
+  },
+  "legacy_smoke_receipt_note": "The version 4 value in smoke-test-receipt.json has no documented in-kernel measurement provenance and is not relied upon by the S2.1 binding procedure.",
+  "method": "Download an explicit published dataset version, extract it, reject symlinks, hash every regular file, serialize rows as '<sha256>  <POSIX-relative-path>\\n' sorted by relative path, then SHA-256 hash the listing bytes.",
+  "official_cli_observation": {
+    "dataset_download_support": "Dataset identifiers accept owner/slug/version and populate dataset_version_number in the download request",
+    "get_kernel_metadata_dataset_field": "dataset_data_sources is a list of source slugs without version numbers",
+    "installed_kaggle_cli_version": "2.2.1",
+    "source_files_inspected": [
+      "kaggle/api/kaggle_api_extended.py",
+      "kagglesdk/kernels/types/kernels_api_service.py"
+    ]
+  },
+  "scientific_run_executed": false,
+  "status": "PASS_CONTENT_BINDING_FEASIBLE",
+  "study_instance": "batteryml-protocol-generalization-s2.1-kaggle"
+}

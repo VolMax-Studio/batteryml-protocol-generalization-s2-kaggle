@@ -25,10 +25,13 @@
     "attempt_002_scope": "Attempt 002 MUST be a complete full restart of all 12 runs from the beginning under identical governing hashes and environment.",
     "governing_run": "The first complete attempt is governing.",
     "isolation_and_combination": "Partial results from different attempts are NEVER combined or spliced together. Every attempt begins in an absent namespace.",
+    "post_run_binding": "Kaggle API and explicit-version dataset downloads occur after execution. Transient external API/download failure leaves PENDING_EXTERNAL_BINDING and may be retried without consuming or rerunning a scientific attempt. A scientific verdict is prohibited until binding succeeds.",
+    "post_run_identity_mismatch": "After successful version enumeration, zero dataset versions matching the runtime canonical listing, a non-complete kernel, or a conclusive output/hash mismatch yields EXECUTION_IDENTITY_UNBOUND. It does not automatically authorize a scientific retry.",
+    "runner_preflight": "Failure before the runner starts the execute-all driver process is operational and does not consume a scientific attempt. Once execute-all starts, the attempt is consumed under this policy.",
     "terminal_failure_disposition": "If Attempt 002 also fails to complete all 12 runs, the disposition is EXECUTION_BLOCKED_RESOURCE."
   },
   "scientific_run_executed": false,
   "status": "FROZEN_EXECUTION_ATTEMPT_POLICY",
   "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
-  "timestamp_utc": "2026-09-16T18:50:00.000000+00:00"
+  "timestamp_utc": "2026-09-16T21:26:41+00:00"
 }
