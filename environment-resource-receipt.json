@@ -1,0 +1,74 @@
+{
+  "cpu_admission": {
+    "admission_rule": "exact_logical_cpus == 4",
+    "rationale": "Prevents XGBoost from altering threading semantics across hosts with differing core counts while preserving upstream model code.",
+    "required_logical_cpus": 4
+  },
+  "memory_admission": {
+    "cgroup_memory_limit_tracking": {
+      "rule": "Record exact cgroup memory limit if constrained; fail-closed if below minimum RAM.",
+      "sources": [
+        "/sys/fs/cgroup/memory.max",
+        "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+      ]
+    },
+    "min_ram_bytes": 33285996544,
+    "observed_meminfo_gib": 31.3477,
+    "observed_meminfo_memtotal_bytes": 33659383808
+  },
+  "offline_wheels": {
+    "addict-2.4.0-py3-none-any.whl": "249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc",
+    "fire-0.7.1-py3-none-any.whl": "e43fd8a5033a9001e7e2973bab96070694b9f12f2e0ecf96d4683971b5ab1882"
+  },
+  "python_environment": {
+    "base_pip_freeze_lines": 872,
+    "base_pip_freeze_sha256": "e137b12924bbb4fbb83f45c8ccb3419ba4e5556d01d977a05a7ab4e175155c35",
+    "cuda_available": false,
+    "exact_version": "3.12.13"
+  },
+  "scientific_run_executed": false,
+  "status": "FROZEN_ENVIRONMENT_RESOURCE_RECEIPT",
+  "study_instance": "batteryml-protocol-generalization-s2-kaggle",
+  "timestamp_utc": "2026-09-16T16:45:41.240573+00:00",
+  "xgboost_resolved_parameters": {
+    "base_score": null,
+    "booster": null,
+    "callbacks": null,
+    "colsample_bylevel": null,
+    "colsample_bynode": null,
+    "colsample_bytree": null,
+    "device": null,
+    "early_stopping_rounds": null,
+    "enable_categorical": false,
+    "eval_metric": null,
+    "feature_types": null,
+    "gamma": null,
+    "grow_policy": null,
+    "importance_type": null,
+    "interaction_constraints": null,
+    "learning_rate": null,
+    "max_bin": null,
+    "max_cat_threshold": null,
+    "max_cat_to_onehot": null,
+    "max_delta_step": null,
+    "max_depth": null,
+    "max_leaves": null,
+    "min_child_weight": null,
+    "missing": "NaN",
+    "monotone_constraints": null,
+    "multi_strategy": null,
+    "n_estimators": null,
+    "n_jobs": null,
+    "num_parallel_tree": null,
+    "objective": "reg:squarederror",
+    "random_state": null,
+    "reg_alpha": null,
+    "reg_lambda": null,
+    "sampling_method": null,
+    "scale_pos_weight": null,
+    "subsample": null,
+    "tree_method": null,
+    "validate_parameters": null,
+    "verbosity": null
+  }
+}

@@ -13,6 +13,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,7 +45,15 @@ EXPECTED_SOURCE_MANIFEST_SHA = "5e239025955a160586a666b3cd50deb03c0e60e8ccf316fb
 EXPECTED_SPLIT_SHA = "96695e534718733469ba108ee3c1372e29351710235d5b47020f6bd9ae2ce722"
 EXPECTED_BASE_FREEZE_SHA = "e137b12924bbb4fbb83f45c8ccb3419ba4e5556d01d977a05a7ab4e175155c35"
 MIN_RAM_BYTES = 31 * 1024**3
-MIN_CPUS = 4
+EXACT_CPUS = 4
+
+S1_EXPOSED_METRICS = {
+    ("primary83", "variance", "a"): 136.12962341308594,
+    ("primary83", "variance", "b"): 133.47593688964844,
+    ("primary83", "ridge", "a"): 115.7891820959575,
+}
+CROSS_ENVIRONMENT_REL_TOLERANCE = 0.010
+MAX_SCIENTIFIC_ATTEMPTS = 2
 
 EXPECTED_FILES = {
     RAW / "2017-05-12_batchdata_updated_struct_errorcorrect.mat": "9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba",
@@ -94,6 +103,23 @@ def mem_total_bytes() -> int:
     raise RuntimeError("MemTotal missing from /proc/meminfo")
 
 
+def cgroup_memory_limit_bytes() -> int | None:
+    for candidate in (
+        Path("/sys/fs/cgroup/memory.max"),
+        Path("/sys/fs/cgroup/memory/memory.limit_in_bytes"),
+    ):
+        if candidate.is_file():
+            try:
+                text = candidate.read_text().strip()
+                if text != "max" and text.isdigit():
+                    return int(text)
+                elif text == "max":
+                    return None
+            except Exception:
+                pass
+    return None
+
+
 def pip_freeze_sha() -> tuple[int, str]:
     text = subprocess.check_output(
         [sys.executable, "-m", "pip", "freeze"], text=True
@@ -131,8 +157,16 @@ def verify_environment() -> dict[str, object]:
     cpus = os.cpu_count() or 0
     if memory < MIN_RAM_BYTES:
         raise RuntimeError(f"RAM below frozen minimum: {memory}")
-    if cpus < MIN_CPUS:
-        raise RuntimeError(f"CPU count below frozen minimum: {cpus}")
+    if cpus != EXACT_CPUS:
+        raise RuntimeError(
+            f"exact CPU logical cores required: {EXACT_CPUS}, observed: {cpus}"
+        )
+    cgroup_limit = cgroup_memory_limit_bytes()
+    xgb_params = (
+        xgboost.XGBRegressor().get_params(deep=True)
+        if hasattr(xgboost, "XGBRegressor")
+        else {}
+    )
     freeze_lines, freeze_sha = pip_freeze_sha()
     if (freeze_lines, freeze_sha) != (872, EXPECTED_BASE_FREEZE_SHA):
         raise RuntimeError(
@@ -142,7 +176,10 @@ def verify_environment() -> dict[str, object]:
         "versions": observed,
         "cuda_available": False,
         "ram_total_bytes": memory,
+        "cgroup_memory_limit_bytes": cgroup_limit,
         "logical_cpus": cpus,
+        "exact_cpu_admission_pass": True,
+        "xgboost_resolved_parameters": xgb_params,
         "base_pip_freeze_lines": freeze_lines,
         "base_pip_freeze_sha256": freeze_sha,
     }
@@ -196,12 +233,17 @@ def read_receipt(path: Path) -> dict[str, str]:
             values[key.strip()] = value.strip()
     required = {
         "status", "instance", "prereg_sha256", "driver_sha256",
-        "operator", "ratified_at",
+        "operator", "ratified_at", "operator_verbatim_statement",
+        "operator_statement_location",
     }
     if not required.issubset(values):
         raise RuntimeError("ratification receipt fields are incomplete")
     if values["status"] != "RATIFIED" or values["instance"] != INSTANCE:
         raise RuntimeError("ratification receipt does not authorize S2")
+    if not values.get("operator_verbatim_statement", "").strip():
+        raise RuntimeError("ratification receipt missing operator verbatim statement")
+    if not values.get("operator_statement_location", "").strip():
+        raise RuntimeError("ratification receipt missing operator statement location")
     if sha256(PREREGISTRATION) != values["prereg_sha256"]:
         raise RuntimeError("preregistration hash mismatch")
     if sha256(DRIVER) != values["driver_sha256"]:
@@ -486,6 +528,38 @@ def adjudicate() -> dict[str, object]:
                 path = ARTIFACT / "results" / universe / split / model / "run-receipt.json"
                 data = json.loads(path.read_text())
                 target[model][split] = {"rmse": data["rmse"], "mae": data["mae"]}
+
+    divergences = {}
+    diverged = False
+    for (u, m, s), s1_val in S1_EXPOSED_METRICS.items():
+        s2_val = primary[m][s]["rmse"]
+        rel_diff = abs(s2_val - s1_val) / s1_val
+        within_tol = (rel_diff <= CROSS_ENVIRONMENT_REL_TOLERANCE)
+        divergences[f"{u}_{m}_{s}"] = {
+            "s1_rmse": s1_val,
+            "s2_rmse": s2_val,
+            "relative_diff": rel_diff,
+            "within_tolerance": within_tol,
+        }
+        if not within_tol:
+            diverged = True
+
+    if diverged:
+        return {
+            "timestamp_utc": utcnow(),
+            "status": "DEFERRED_ENVIRONMENT_DIVERGENCE",
+            "adjudication": "DEFERRED_ENVIRONMENT_DIVERGENCE",
+            "primary": primary,
+            "sensitivity": sensitivity,
+            "s1_divergences": divergences,
+            "cross_environment_relative_tolerance": CROSS_ENVIRONMENT_REL_TOLERANCE,
+            "message": (
+                "One or more exposed S1 metrics deviated by >1.0% relative in S2; "
+                "scientific gate triggers not adjudicated."
+            ),
+            "automatic_neural_continuation": False,
+        }
+
     relative = {
         model: (scores["b"]["rmse"] - scores["a"]["rmse"]) / scores["a"]["rmse"]
         for model, scores in primary.items()
@@ -499,15 +573,25 @@ def adjudicate() -> dict[str, object]:
             scores["b"]["rmse"] > scores["a"]["rmse"] for scores in primary.values()
         ),
     }
+    trigger_exposure_classification = {
+        "any_relative_rmse_change_ge_10_percent": "partially_exposed_decision_weight_on_unverified_models",
+        "rmse_model_order_changed": "partially_exposed_decision_weight_on_unverified_models",
+        "all_three_strictly_worse_under_b": "pre_exposed_no_independent_confirmatory_weight",
+    }
     signal = any(triggers.values())
     return {
         "timestamp_utc": utcnow(),
+        "status": "ADJUDICATED",
         "primary": primary,
         "sensitivity": sensitivity,
         "relative_rmse_change": relative,
         "rmse_order_a_best_to_worst": order_a,
         "rmse_order_b_best_to_worst": order_b,
+        "s1_divergences": divergences,
+        "cross_environment_relative_tolerance": CROSS_ENVIRONMENT_REL_TOLERANCE,
         "triggers": triggers,
+        "trigger_exposure_classification": trigger_exposure_classification,
+        "trigger_3_status": "pre-exposed / no independent confirmatory weight (Variance B < Variance A in S1)",
         "adjudication": "SIGNAL_POSITIVE_MODEL_GATE" if signal else "STOP_NO_MATERIAL_SIGNAL",
         "automatic_neural_continuation": False,
     }
@@ -523,15 +607,39 @@ def artifact_manifest() -> str:
 
 
 def command_execute_all(args: argparse.Namespace) -> None:
+    attempt = getattr(args, "attempt", 1)
+    if attempt not in (1, 2):
+        raise ValueError(f"attempt must be 1 or 2, got {attempt}")
     ratification = read_receipt(args.ratification_receipt)
     environment = verify_environment()
     inputs = verify_inputs()
     if ARTIFACT.exists() or PROCESSED.exists() or SITE.exists():
         raise RuntimeError("refusing pre-existing S2 execution namespace")
     ARTIFACT.mkdir(parents=True, exist_ok=False)
+
+    start_time = utcnow()
+    kernel_id = os.environ.get("KAGGLE_KERNEL_RUN_TYPE", "") or os.environ.get(
+        "KAGGLE_URL", "kaggle-cpu-session"
+    )
+    ledger_entry: dict[str, object] = {
+        "attempt_number": attempt,
+        "kaggle_kernel_run_id_or_url": kernel_id,
+        "start_utc": start_time,
+        "end_utc": None,
+        "governing_prereg_sha256": sha256(PREREGISTRATION),
+        "governing_driver_sha256": sha256(DRIVER),
+        "exit_code": None,
+        "disposition": None,
+        "generated_receipts": [],
+    }
+    (ARTIFACT / "attempt-ledger.json").write_text(
+        json.dumps(ledger_entry, indent=2, sort_keys=True) + "\n"
+    )
+
     extras = install_extras()
     closure = {
         "timestamp_utc": utcnow(),
+        "attempt": attempt,
         "ratification": ratification,
         "environment": environment,
         "inputs": inputs,
@@ -544,39 +652,237 @@ def command_execute_all(args: argparse.Namespace) -> None:
     )
 
     receipt_arg = str(args.ratification_receipt)
-    run_child(
-        ["preprocess-one", "--ratification-receipt", receipt_arg],
-        "00-preprocess",
-        PROCESSED / "preprocess-receipt.json",
-    )
-    counter = 1
-    for universe in ("primary83", "sensitivity84"):
-        for model in ("variance", "ridge", "xgb"):
-            for split in ("a", "b"):
-                label = f"{counter:02d}-{universe}-{model}-{split}"
-                receipt = ARTIFACT / "results" / universe / split / model / "run-receipt.json"
-                run_child([
-                    "run-one", "--ratification-receipt", receipt_arg,
-                    "--universe", universe, "--split", split, "--model", model,
-                ], label, receipt)
-                counter += 1
+    try:
+        run_child(
+            ["preprocess-one", "--ratification-receipt", receipt_arg],
+            "00-preprocess",
+            PROCESSED / "preprocess-receipt.json",
+        )
+        counter = 1
+        for universe in ("primary83", "sensitivity84"):
+            for model in ("variance", "ridge", "xgb"):
+                for split in ("a", "b"):
+                    label = f"{counter:02d}-{universe}-{model}-{split}"
+                    receipt = ARTIFACT / "results" / universe / split / model / "run-receipt.json"
+                    run_child([
+                        "run-one", "--ratification-receipt", receipt_arg,
+                        "--universe", universe, "--split", split, "--model", model,
+                    ], label, receipt)
+                    counter += 1
 
-    decision = adjudicate()
-    (ARTIFACT / "adjudication.json").write_text(
-        json.dumps(decision, indent=2, sort_keys=True) + "\n"
-    )
-    manifest_sha = artifact_manifest()
-    summary = {
-        "timestamp_utc": utcnow(),
-        "status": "COMPLETE",
-        "instance": INSTANCE,
-        "adjudication": decision["adjudication"],
-        "artifact_manifest_sha256": manifest_sha,
-    }
-    (ARTIFACT / "completion-receipt.json").write_text(
-        json.dumps(summary, indent=2, sort_keys=True) + "\n"
-    )
-    print(json.dumps(summary, indent=2, sort_keys=True))
+        decision = adjudicate()
+        (ARTIFACT / "adjudication.json").write_text(
+            json.dumps(decision, indent=2, sort_keys=True) + "\n"
+        )
+        manifest_sha = artifact_manifest()
+        summary = {
+            "timestamp_utc": utcnow(),
+            "attempt": attempt,
+            "status": "COMPLETE",
+            "instance": INSTANCE,
+            "adjudication": decision["adjudication"],
+            "artifact_manifest_sha256": manifest_sha,
+        }
+        (ARTIFACT / "completion-receipt.json").write_text(
+            json.dumps(summary, indent=2, sort_keys=True) + "\n"
+        )
+        ledger_entry["end_utc"] = utcnow()
+        ledger_entry["exit_code"] = 0
+        ledger_entry["disposition"] = "GOVERNING_COMPLETE"
+        ledger_entry["generated_receipts"] = [
+            "execution-closure.json",
+            "adjudication.json",
+            "completion-receipt.json",
+            "artifact-files.sha256",
+        ]
+        (ARTIFACT / "attempt-ledger.json").write_text(
+            json.dumps(ledger_entry, indent=2, sort_keys=True) + "\n"
+        )
+        print(json.dumps(summary, indent=2, sort_keys=True))
+    except Exception as exc:
+        ledger_entry["end_utc"] = utcnow()
+        ledger_entry["exit_code"] = 1
+        ledger_entry["disposition"] = (
+            "FAILED_PLATFORM_RETRY_ALLOWED" if attempt == 1 else "EXECUTION_BLOCKED_RESOURCE"
+        )
+        (ARTIFACT / "attempt-ledger.json").write_text(
+            json.dumps(ledger_entry, indent=2, sort_keys=True) + "\n"
+        )
+        raise exc
+
+
+def command_verify_determinism(_: argparse.Namespace) -> None:
+    """Verify byte-identical recreation on a synthetic fixture without touching raw data."""
+    sys.path.insert(0, str(REPO))
+    from batteryml.data.battery_data import BatteryData, CycleData
+    from batteryml.builders import MODELS as MODEL_BUILDERS
+    from batteryml.train_test_split.base import BaseTrainTestSplitter
+    from batteryml.task import Task
+    from batteryml.pipeline import set_seed
+
+    def run_pass(output_dir: Path) -> dict[str, dict[str, object]]:
+        tmp_data = output_dir / "data"
+        tmp_data.mkdir(parents=True, exist_ok=True)
+        train_paths, test_paths = [], []
+        cells_spec = [
+            ("synth_1", 800.0, 0.01, True),
+            ("synth_2", 900.0, 0.02, True),
+            ("synth_3", 750.0, -0.01, False),
+            ("synth_4", 850.0, -0.02, False),
+        ]
+        for cid, life, noise, is_tr in cells_spec:
+            cycles = []
+            for c in range(105):
+                q = np.linspace(1.1 - 0.001 * c + noise, 0.1, 1000)
+                cd = CycleData(
+                    cycle_number=c,
+                    Qdlin=q.tolist(),
+                    discharge_capacity_in_Ah=[float(q[0])],
+                )
+                cycles.append(cd)
+            b = BatteryData(
+                cell_id=cid,
+                cycle_data=cycles,
+                nominal_capacity_in_Ah=1.1,
+                max_cycle=life,
+            )
+            p = tmp_data / f"{cid}.pkl"
+            b.dump(p)
+            if is_tr:
+                train_paths.append(p)
+            else:
+                test_paths.append(p)
+
+        class Splitter(BaseTrainTestSplitter):
+            def __init__(self):
+                super().__init__(str(tmp_data))
+                self.train_cells = train_paths
+                self.test_cells = test_paths
+
+            def split(self):
+                return self.train_cells, self.test_cells
+
+        splitter = Splitter()
+        model_configs = [
+            (
+                "variance",
+                "LinearRegressionRULPredictor",
+                {
+                    "name": "VarianceModelFeatureExtractor",
+                    "interp_dims": 1000,
+                    "critical_cycles": [2, 9, 99],
+                    "use_precalculated_qdlin": True,
+                },
+            ),
+            (
+                "ridge",
+                "RidgeRULPredictor",
+                {
+                    "name": "VoltageCapacityMatrixFeatureExtractor",
+                    "diff_base": 8,
+                    "max_cycle_index": 98,
+                    "cycles_to_keep": 98,
+                    "use_precalculated_qdlin": True,
+                },
+            ),
+            (
+                "xgb",
+                "XGBoostRULPredictor",
+                {
+                    "name": "VoltageCapacityMatrixFeatureExtractor",
+                    "diff_base": 8,
+                    "max_cycle_index": 98,
+                    "cycles_to_keep": 98,
+                    "use_precalculated_qdlin": True,
+                },
+            ),
+        ]
+        results = {}
+        for short_name, mname, f_conf in model_configs:
+            task = Task(
+                train_test_splitter=splitter,
+                feature_extractor=f_conf,
+                label_annotator={"name": "RULLabelAnnotator"},
+                feature_transformation={"name": "ZScoreDataTransformation"},
+                label_transformation={
+                    "name": "SequentialDataTransformation",
+                    "transformations": [
+                        {"name": "LogScaleDataTransformation"},
+                        {"name": "ZScoreDataTransformation"},
+                    ],
+                },
+            )
+            dataset = task.build().to("cpu")
+            set_seed(0)
+            model = MODEL_BUILDERS.build({"name": mname})
+            m_workspace = output_dir / short_name
+            m_workspace.mkdir(parents=True, exist_ok=True)
+            model.workspace = m_workspace
+            model.fit(dataset, timestamp="frozen")
+            pred = model.predict(dataset)
+            target = dataset.test_data.label
+            if dataset.label_transformation is not None:
+                pred = dataset.label_transformation.inverse_transform(pred)
+                target = dataset.label_transformation.inverse_transform(target)
+            target_vals = target.detach().cpu().numpy().reshape(-1)
+            pred_vals = pred.detach().cpu().numpy().reshape(-1)
+            rmse = float(np.sqrt(np.mean((target_vals - pred_vals) ** 2)))
+            mae = float(np.mean(np.abs(target_vals - pred_vals)))
+
+            preds_path = output_dir / f"{short_name}_predictions.csv"
+            with open(preds_path, "w", newline="") as h:
+                w = csv.writer(h)
+                w.writerow(["cell_id", "target", "prediction"])
+                for cid, obs, pr in zip(["synth_3", "synth_4"], target_vals, pred_vals):
+                    w.writerow([cid, repr(float(obs)), repr(float(pr))])
+
+            metrics_path = output_dir / f"{short_name}_metrics.json"
+            with open(metrics_path, "w") as h:
+                json.dump({"rmse": rmse, "mae": mae}, h, indent=2, sort_keys=True)
+
+            results[short_name] = {
+                "predictions_sha256": hashlib.sha256(preds_path.read_bytes()).hexdigest(),
+                "metrics_sha256": hashlib.sha256(metrics_path.read_bytes()).hexdigest(),
+                "metrics": {"rmse": rmse, "mae": mae},
+            }
+        return results
+
+    base_tmp = Path(tempfile.mkdtemp())
+    try:
+        res1 = run_pass(base_tmp / "pass1")
+        res2 = run_pass(base_tmp / "pass2")
+        match = (res1 == res2)
+        receipt = {
+            "timestamp_utc": utcnow(),
+            "status": "PASS" if match else "FAIL",
+            "rule": "rename_rerun_byte_identical",
+            "scope": {
+                "fixture_type": "synthetic_non_matr_cells",
+                "models_verified": ["variance", "ridge", "xgb"],
+                "comparison": ["per-cell-predictions.csv", "metrics.json"],
+                "timestamps_excluded": True,
+                "host_metadata_excluded": True,
+            },
+            "pass1_hashes": {
+                k: {
+                    "predictions_sha256": v["predictions_sha256"],
+                    "metrics_sha256": v["metrics_sha256"],
+                }
+                for k, v in res1.items()
+            },
+            "pass2_hashes": {
+                k: {
+                    "predictions_sha256": v["predictions_sha256"],
+                    "metrics_sha256": v["metrics_sha256"],
+                }
+                for k, v in res2.items()
+            },
+            "byte_identical_match": match,
+            "canonical_metrics": {k: v["metrics"] for k, v in res1.items()},
+        }
+        print(json.dumps(receipt, indent=2, sort_keys=True))
+    finally:
+        shutil.rmtree(base_tmp)
 
 
 def parse_args() -> argparse.Namespace:
@@ -595,7 +901,10 @@ def parse_args() -> argparse.Namespace:
     run.set_defaults(func=command_run)
     execute = subparsers.add_parser("execute-all")
     execute.add_argument("--ratification-receipt", type=Path, required=True)
+    execute.add_argument("--attempt", type=int, choices=[1, 2], default=1)
     execute.set_defaults(func=command_execute_all)
+    det = subparsers.add_parser("verify-determinism")
+    det.set_defaults(func=command_verify_determinism)
     return parser.parse_args()
 
 

@@ -1,0 +1,34 @@
+{
+  "license_provenance": {
+    "edp_api_endpoint": "https://data.matr.io/1/api/v1/edp/configuration",
+    "grant_scope": "CC BY 4.0 Section 2(a)(1) grants a worldwide, royalty-free, non-sublicensable, non-exclusive, irrevocable license to reproduce and Share the Licensed Material, in whole or in part, and produce, reproduce, and Share Adapted Material for any purpose.",
+    "license_standard": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "verbatim_api_license_field": {
+      "label": "CC BY 4",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "verbatim_platform_ui_text": "All data is released under [CC BY 4](https://creativecommons.org/licenses/by/4.0/)"
+  },
+  "non_reliance_on_third_party_rehost": {
+    "policy": "The Kaggle rehost license tag (\"MIT\" on rickandjoe/mit-battery-degradation-dataset) is third-party metadata and is NOT used as proof of original dataset licensing.",
+    "s2_operational_disposition": "Raw HDF5 files are not re-uploaded or redistributed by S2. S2 attaches the existing read-only Kaggle mount under hash verification, where pre-ratification probing confirmed byte identity with official MATR downloads."
+  },
+  "original_data_provider": {
+    "associated_publication": {
+      "citation": "Severson, K. A., Attia, P. M., Jin, N., et al. Data-driven prediction of battery cycle life before capacity degradation. Nature Energy 4, 383\u2013391 (2019).",
+      "doi": "https://doi.org/10.1038/s41560-019-0356-8"
+    },
+    "institution_url": "https://www.tri.global/",
+    "name": "Toyota Research Institute (TRI) - Experimental Data Platform (MATR)",
+    "portal_url": "https://data.matr.io/1/",
+    "project_url": "https://data.matr.io/1/projects/5c48dd2bc625d700019f3204"
+  },
+  "raw_file_hashes": {
+    "2017-05-12_batchdata_updated_struct_errorcorrect.mat": "9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba",
+    "2017-06-30_batchdata_updated_struct_errorcorrect.mat": "63ab200d09ecb237fee5ef3a5c5db76e3212e3206a0bd92f769e1427fed338b8"
+  },
+  "scientific_run_executed": false,
+  "status": "PASS_VERIFIED_ORIGINAL_MATR_CC_BY_4_0",
+  "study_instance": "batteryml-protocol-generalization-s2-kaggle",
+  "timestamp_utc": "2026-09-16T16:45:18.248218+00:00"
+}

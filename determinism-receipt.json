@@ -1,0 +1,62 @@
+{
+  "byte_identical_match": true,
+  "canonical_metrics": {
+    "ridge": {
+      "mae": 1.8767780574080462e-06,
+      "rmse": 1.8767780574080462e-06
+    },
+    "variance": {
+      "mae": 0.0,
+      "rmse": 0.0
+    },
+    "xgb": {
+      "mae": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "pass1_hashes": {
+    "ridge": {
+      "metrics_sha256": "6a7d462769502800a194545f9225385757e002ea4c9754200d4341864ccf60bc",
+      "predictions_sha256": "31e9494ad407bcfddb1cd91efe5af5cd93a739e540457287f5d37210768a30bc"
+    },
+    "variance": {
+      "metrics_sha256": "bff2cfcf059b2e68be7aef0b0158929fa6bba72034b3137492040b79ccdf2503",
+      "predictions_sha256": "e14d4f285767fb2d6f758b0d30b6173a25a70052289c8cf01ac93215da4c68cf"
+    },
+    "xgb": {
+      "metrics_sha256": "bff2cfcf059b2e68be7aef0b0158929fa6bba72034b3137492040b79ccdf2503",
+      "predictions_sha256": "e14d4f285767fb2d6f758b0d30b6173a25a70052289c8cf01ac93215da4c68cf"
+    }
+  },
+  "pass2_hashes": {
+    "ridge": {
+      "metrics_sha256": "6a7d462769502800a194545f9225385757e002ea4c9754200d4341864ccf60bc",
+      "predictions_sha256": "31e9494ad407bcfddb1cd91efe5af5cd93a739e540457287f5d37210768a30bc"
+    },
+    "variance": {
+      "metrics_sha256": "bff2cfcf059b2e68be7aef0b0158929fa6bba72034b3137492040b79ccdf2503",
+      "predictions_sha256": "e14d4f285767fb2d6f758b0d30b6173a25a70052289c8cf01ac93215da4c68cf"
+    },
+    "xgb": {
+      "metrics_sha256": "bff2cfcf059b2e68be7aef0b0158929fa6bba72034b3137492040b79ccdf2503",
+      "predictions_sha256": "e14d4f285767fb2d6f758b0d30b6173a25a70052289c8cf01ac93215da4c68cf"
+    }
+  },
+  "rule": "rename_rerun_byte_identical",
+  "scope": {
+    "comparison": [
+      "per-cell-predictions.csv",
+      "metrics.json"
+    ],
+    "fixture_type": "synthetic_non_matr_cells",
+    "host_metadata_excluded": true,
+    "models_verified": [
+      "variance",
+      "ridge",
+      "xgb"
+    ],
+    "timestamps_excluded": true
+  },
+  "status": "PASS",
+  "timestamp_utc": "2026-09-16T16:44:09.085089+00:00"
+}

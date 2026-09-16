@@ -1,0 +1,55 @@
+{
+  "cross_environment_relative_tolerance": 0.01,
+  "divergence_disposition": "DEFERRED_ENVIRONMENT_DIVERGENCE",
+  "exposed_metrics_from_s1": {
+    "primary83_ridge_a": {
+      "exposure": "exposed",
+      "mae": 80.41317165427543,
+      "rmse": 115.7891820959575
+    },
+    "primary83_variance_a": {
+      "exposure": "exposed",
+      "mae": 109.06492614746094,
+      "rmse": 136.12962341308594
+    },
+    "primary83_variance_b": {
+      "exposure": "exposed",
+      "mae": 109.73088836669922,
+      "rmse": 133.47593688964844,
+      "s1_direction": "RMSE_B < RMSE_A",
+      "s1_relative_change_pct": -1.949339
+    }
+  },
+  "gate_trigger_exposure_classifications": {
+    "trigger_1_relative_rmse_change_ge_10_percent": {
+      "classification": "partially_exposed",
+      "decision_weight": "unverified_models_only",
+      "rationale": "S1 Variance relative change is known to be -1.95% (well below 10%). Variance cannot activate Trigger 1 unless environmental divergence occurs (>1% error). Therefore, Trigger 1 decision weight rests entirely on unverified Ridge B and XGBoost A/B."
+    },
+    "trigger_2_rmse_model_order_changed": {
+      "classification": "partially_exposed",
+      "decision_weight": "unverified_models_only",
+      "rationale": "Unrounded RMSE model ordering between A and B cannot be computed without unverified Ridge B and XGBoost A/B."
+    },
+    "trigger_3_all_three_strictly_worse_under_b": {
+      "classification": "pre_exposed",
+      "decision_weight": "no_independent_confirmatory_weight",
+      "rationale": "In S1, Variance under B is strictly lower than under A (133.476 < 136.130). If S2 reproduces Variance within the 1.0% cross-environment tolerance, Trigger 3 is guaranteed to be false prior to run. It remains implemented in code for exhaustive protocol fidelity, but carries no independent confirmatory weight."
+    }
+  },
+  "scientific_run_executed": false,
+  "status": "FROZEN_PRIOR_KNOWLEDGE_BOUNDARY",
+  "study_instance": "batteryml-protocol-generalization-s2-kaggle",
+  "timestamp_utc": "2026-09-16T16:44:38.377897+00:00",
+  "unverified_models_and_metrics": {
+    "primary83_ridge_b": "exposure: unverified",
+    "primary83_xgb_a": "exposure: unverified",
+    "primary83_xgb_b": "exposure: unverified",
+    "sensitivity84_ridge_a": "exposure: unverified",
+    "sensitivity84_ridge_b": "exposure: unverified",
+    "sensitivity84_variance_a": "exposure: unverified",
+    "sensitivity84_variance_b": "exposure: unverified",
+    "sensitivity84_xgb_a": "exposure: unverified",
+    "sensitivity84_xgb_b": "exposure: unverified"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "attempt_ledger_schema": {
+    "disposition_values": [
+      "GOVERNING_COMPLETE",
+      "FAILED_PLATFORM_RETRY_ALLOWED",
+      "EXECUTION_BLOCKED_RESOURCE"
+    ],
+    "required_fields": [
+      "attempt_number",
+      "kaggle_kernel_run_id_or_url",
+      "start_utc",
+      "end_utc",
+      "governing_prereg_sha256",
+      "governing_driver_sha256",
+      "exit_code",
+      "disposition",
+      "generated_receipts"
+    ]
+  },
+  "max_scientific_attempts": 2,
+  "rules": {
+    "attempt_001": "Initial complete execution attempt across all 12 runs.",
+    "attempt_002_conditions": "Attempt 002 is permitted ONLY IF Attempt 001 fails to complete all twelve runs due to platform/resource failure (e.g., host OOM, platform timeout, unexpected container termination).",
+    "attempt_002_scope": "Attempt 002 MUST be a complete full restart of all 12 runs from the beginning under identical governing hashes and environment.",
+    "governing_run": "The first complete attempt is governing.",
+    "isolation_and_combination": "Partial results from different attempts are NEVER combined or spliced together. Every attempt begins in an absent namespace.",
+    "terminal_failure_disposition": "If Attempt 002 also fails to complete all 12 runs, the disposition is EXECUTION_BLOCKED_RESOURCE."
+  },
+  "scientific_run_executed": false,
+  "status": "FROZEN_EXECUTION_ATTEMPT_POLICY",
+  "study_instance": "batteryml-protocol-generalization-s2-kaggle",
+  "timestamp_utc": "2026-09-16T16:45:05.596385+00:00"
+}
