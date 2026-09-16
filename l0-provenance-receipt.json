@@ -27,8 +27,9 @@
     "2017-05-12_batchdata_updated_struct_errorcorrect.mat": "9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba",
     "2017-06-30_batchdata_updated_struct_errorcorrect.mat": "63ab200d09ecb237fee5ef3a5c5db76e3212e3206a0bd92f769e1427fed338b8"
   },
+  "derived_from": "batteryml-protocol-generalization-s2-kaggle@2ad8e8cd7430dec78be588f21e7c374b2c75c886",
   "scientific_run_executed": false,
   "status": "PASS_VERIFIED_ORIGINAL_MATR_CC_BY_4_0",
   "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
-  "timestamp_utc": "2026-09-16T16:45:18.248218+00:00"
+  "timestamp_utc": "2026-09-16T18:50:00.000000+00:00"
 }

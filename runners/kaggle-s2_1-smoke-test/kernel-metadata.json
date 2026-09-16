@@ -1,0 +1,17 @@
+{
+  "id": "volmax1/batteryml-s2-1-smoke-test",
+  "title": "BatteryML S2.1 Smoke Test",
+  "code_file": "smoke_test.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_internet": false,
+  "dataset_sources": [
+    "rickandjoe/mit-battery-degradation-dataset",
+    "volmax1/batteryml-protocol-generalization-s2-controls"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

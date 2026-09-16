@@ -318,17 +318,16 @@ def activate_extras() -> None:
         raise RuntimeError("addict version mismatch")
     if str(getattr(fire, "__version__", "0.7.1")) != "0.7.1":
         raise RuntimeError("fire version mismatch")
-    addict_path = Path(getattr(addict, "__file__", "")).resolve()
-    fire_path = Path(getattr(fire, "__file__", "")).resolve()
     site_resolved = SITE.resolve()
-    if not str(addict_path).startswith(str(site_resolved)):
-        raise RuntimeError(
-            f"addict provenance violation: loaded from {addict_path}, expected within {site_resolved}"
-        )
-    if not str(fire_path).startswith(str(site_resolved)):
-        raise RuntimeError(
-            f"fire provenance violation: loaded from {fire_path}, expected within {site_resolved}"
-        )
+    for mod, name in ((addict, "addict"), (fire, "fire")):
+        mod_file = getattr(mod, "__file__", None)
+        if not mod_file:
+            raise RuntimeError(f"{name} missing __file__ attribute")
+        mod_path = Path(mod_file).resolve()
+        if not mod_path.is_relative_to(site_resolved):
+            raise RuntimeError(
+                f"{name} provenance violation: loaded from {mod_path}, expected within {site_resolved}"
+            )
 
 
 def processed_rows() -> list[tuple[str, str]]:
@@ -622,6 +621,9 @@ def command_execute_all(args: argparse.Namespace) -> None:
     attempt = getattr(args, "attempt", 1)
     if attempt not in (1, 2):
         raise ValueError(f"attempt must be 1 or 2, got {attempt}")
+    kernel_id = getattr(args, "kernel_id", "").strip()
+    if not kernel_id:
+        raise ValueError("--kernel-id (slug, version, and URL) is required for execute-all")
     ratification = read_receipt(args.ratification_receipt)
     environment = verify_environment()
     inputs = verify_inputs()
@@ -630,12 +632,6 @@ def command_execute_all(args: argparse.Namespace) -> None:
     ARTIFACT.mkdir(parents=True, exist_ok=False)
 
     start_time = utcnow()
-    kernel_id = (
-        getattr(args, "kernel_id", "")
-        or os.environ.get("KAGGLE_KERNEL_RUN_SLUG_OR_URL", "").strip()
-        or os.environ.get("KAGGLE_URL", "").strip()
-        or os.environ.get("KAGGLE_KERNEL_RUN_TYPE", "kaggle-cpu-session")
-    )
     ledger_entry: dict[str, object] = {
         "attempt_number": attempt,
         "kaggle_kernel_run_id_or_url": kernel_id,
@@ -718,7 +714,9 @@ def command_execute_all(args: argparse.Namespace) -> None:
         ledger_entry["end_utc"] = utcnow()
         ledger_entry["exit_code"] = 1
         ledger_entry["disposition"] = (
-            "FAILED_PLATFORM_RETRY_ALLOWED" if attempt == 1 else "EXECUTION_BLOCKED_RESOURCE"
+            "FAILED_PENDING_OPERATOR_CLASSIFICATION"
+            if attempt == 1
+            else "EXECUTION_BLOCKED_RESOURCE"
         )
         (ARTIFACT / "attempt-ledger.json").write_text(
             json.dumps(ledger_entry, indent=2, sort_keys=True) + "\n"
@@ -918,6 +916,7 @@ def command_smoke_test_child(args: argparse.Namespace) -> None:
         "timestamp_utc": utcnow(),
         "status": "PASS",
         "scope": "parent_to_child_environment_admission",
+        "governing_driver_sha256": sha256(DRIVER),
         "parent_environment": environment,
         "parent_inputs": inputs,
         "offline_extras": extras,
@@ -963,7 +962,12 @@ def parse_args() -> argparse.Namespace:
     execute = subparsers.add_parser("execute-all")
     execute.add_argument("--ratification-receipt", type=Path, required=True)
     execute.add_argument("--attempt", type=int, choices=[1, 2], default=1)
-    execute.add_argument("--kernel-id", type=str, default="")
+    execute.add_argument(
+        "--kernel-id",
+        type=str,
+        required=True,
+        help="Explicit Kaggle kernel slug, version, and URL (e.g. volmax1/batteryml-s2-1-execution/1)",
+    )
     execute.set_defaults(func=command_execute_all)
     det = subparsers.add_parser("verify-determinism")
     det.set_defaults(func=command_verify_determinism)

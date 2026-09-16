@@ -23,26 +23,46 @@
     },
     "pythonpath": "/kaggle/working/s2-site-packages",
     "status": "PASS",
-    "timestamp_utc": "2026-09-16T18:37:04.894370+00:00"
+    "timestamp_utc": "2026-09-16T19:17:13.908842+00:00"
   },
+  "control_dataset": {
+    "mount_path": "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls",
+    "slug": "volmax1/batteryml-protocol-generalization-s2-controls",
+    "version": 4
+  },
+  "derived_from": "batteryml-protocol-generalization-s2-kaggle@2ad8e8cd7430dec78be588f21e7c374b2c75c886",
+  "governing_driver_sha256": "c943e1d52478bbec578ec1d06dcbc84b627f33f3e73e3edd18a38c43dbfc65b9",
   "kaggle_kernel_run": {
     "kernel_slug": "volmax1/batteryml-s2-1-smoke-test",
     "kernel_url": "https://www.kaggle.com/code/volmax1/batteryml-s2-1-smoke-test",
+    "kernel_version": 2,
     "platform": "Kaggle CPU host"
   },
   "module_provenance": {
     "addict_file_prefix": "/kaggle/working/s2-site-packages",
     "fire_file_prefix": "/kaggle/working/s2-site-packages",
+    "provenance_method": "Path.resolve().is_relative_to",
     "provenance_verified": true
   },
+  "parent_execution": {
+    "scope": "parent_to_child_environment_admission",
+    "status": "PASS",
+    "timestamp_utc": "2026-09-16T19:17:14.669402+00:00"
+  },
   "receipt_hashes": {
-    "child_receipt_sha256": "34b1b239342a13684cf89ccea877a96b63cd4b52b983980a2aa6394602f7f98a",
-    "kernel_log_sha256": "54071546df8a1450a14bb0e26764ea8c123455672e52a36fba038857920498ca",
-    "parent_receipt_sha256": "f34c697cd7df90a8dbad0ef5c14ec335a6a798a5c15b5aa98ea906e32b3c2671",
-    "smoke_test_report_sha256": "25a216b0b4872b4f2ab3997628a5f7015ce49f22fed8bb4e4890740c31f1ed28"
+    "child_receipt_sha256": "829775392adb7d125b29da043dbc1e9aeafae40d4c97eccd7435646b46ee93af",
+    "kernel_log_sha256": "e56aa9135d8cf241f386d7b7b189b5a75eb749e11221d290fa02a831887f00cf",
+    "parent_receipt_sha256": "6958831a48f99934153a5261b33b9ebc3e74c46eb29916d11c899895bfc5d542",
+    "smoke_test_report_sha256": "a1297b5cb9d2e88990caa63a81c270f93d0218610c902e66a99b1df9d8c46d67"
+  },
+  "runner_script": {
+    "path": "/kaggle/src/script.py",
+    "repo_path": "runners/kaggle-s2_1-smoke-test/smoke_test.py",
+    "sha256": "94d3c4aff77052c9da6a1342ac716600089c3e8e582808ae6e46fb8a0c99e7bb"
   },
   "scientific_run_executed": false,
   "status": "PASS",
   "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
-  "timestamp_utc": "2026-09-16T18:37:05.682035+00:00"
+  "superseded_driver_sha256": "ac6236fd2c6c33902e221c8c842091cfe5c72230624a29be1ba7bf0d0004fff9",
+  "timestamp_utc": "2026-09-16T19:17:15.331684+00:00"
 }

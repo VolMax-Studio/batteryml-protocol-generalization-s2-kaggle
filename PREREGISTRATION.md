@@ -29,16 +29,18 @@ Exposure status for the remaining model cells is unverified.
 S1 values cannot be copied into, substituted for, or adjudicated as S2.1
 results. S2.1 must execute its entire matrix from the beginning.
 
-### S2 Attempt 001 execution failure and zero exposure
+### S2 Attempt 001 execution failure and exposure status
 
 S2 Attempt 001 on Kaggle CPU host (`volmax1/batteryml-s2-attempt-001`) deterministically aborted
 during preflight environment admission inside child process `00-preprocess` prior to directory
-creation (`PROCESSED.mkdir`) or loading of any MATR raw files (`load_batch`). The failure occurred
+creation (`PROCESSED.mkdir`) or loading of any MATR raw batch data (`load_batch`). The failure occurred
 because `run_child` passed `PYTHONPATH=/kaggle/working/s2-site-packages`, causing child `pip freeze`
 to enumerate offline wheels (`addict`, `fire`) as 874 lines instead of 872 base packages.
-The Operator formally classified this event under [L3] as `PRE-SCIENTIFIC_EXECUTION_FAILURE`.
-Zero raw data was ingested, zero models were fit, and zero scientific metrics were exposed.
-S2 is formally closed, and S2.1 executes the unexposed scientific protocol under a repaired driver.
+The Operator formally ratified the classification of Attempt 001 as `PRE-SCIENTIFIC_EXECUTION_FAILURE`.
+Raw files were hashed in binary read mode during preflight input verification (`verify_inputs()`), but never
+loaded into the BatteryML preprocessing pipeline (`load_batch` was never called). No additional scientific
+exposure occurred from S2 Attempt 001 beyond the previously known S1 exposed metrics. S2 is formally closed,
+and S2.1 executes the governing scientific design under the repaired driver.
 
 ### Cross-environment divergence disposition
 
@@ -167,7 +169,7 @@ after ratification. No neural model is part of S2.
 
 - Private Kaggle CPU kernel; internet disabled; GPU disabled.
 - Python exactly `3.12.13`.
-- Linux x86_64; at least `31 GiB` total RAM.
+- Linux x86_64; at least `31 GiB` total RAM (`mem_total_bytes >= 31 GiB`). Hardware admission evaluates `/proc/meminfo MemTotal` (observed: 31.35 GiB / 33,659,383,808 bytes). The container cgroup memory limit (`memory.max`) in Kaggle CPU containers is tracked (observed: 30.00 GiB / 32,212,254,720 bytes), providing >3.5x headroom over the peak ~8 GiB preprocessing and ~4 GiB training workloads.
 - **CPU admission**: Exactly **4 logical CPU cores** required (`logical_cpus == 4`). Hosts with core counts different from 4 fail admission closed. This requirement freezes XGBoost threading semantics without altering upstream BatteryML code.
 - **Memory tracking**: Both `/proc/meminfo MemTotal` and cgroup memory limit (`memory.max` under cgroup v2, or `memory.limit_in_bytes` under cgroup v1) are recorded in the environment receipt.
 - Kaggle base `pip freeze` SHA-256 exactly
@@ -191,13 +193,14 @@ a frozen determinism verification protocol:
 Execution is governed by a strict attempt policy frozen in `attempt-policy-receipt.json`:
 - **Maximum 2 scientific attempts** are permitted.
 - Attempt 001 executes the full 12-run matrix from an empty workspace.
-- Attempt 002 is permitted **ONLY IF** Attempt 001 failed to complete all twelve runs due to an unexpected platform/resource failure (e.g. host OOM, platform timeout, or session disconnection).
+- Any unhandled failure in Attempt 001 records initial disposition `FAILED_PENDING_OPERATOR_CLASSIFICATION`; it never automatically transitions to `FAILED_PLATFORM_RETRY_ALLOWED`.
+- Attempt 002 is permitted **ONLY IF** Attempt 001 failed to complete all twelve runs and the Operator formally classifies the failure under [L3] as an unexpected platform/resource failure (e.g. host OOM, platform timeout, or session disconnection). Any deterministic code or pre-scientific failure remains non-retryable without a new execution-repair instance.
 - Attempt 002 must be a **full restart** of all twelve runs from the beginning with identical governing hashes and environment.
 - Partial results from different attempts are **never combined or spliced**.
 - The first complete attempt is governing.
 - If Attempt 002 also fails to complete all twelve runs, the terminal disposition is **`EXECUTION_BLOCKED_RESOURCE`**.
 - An immutable attempt ledger (`attempt-ledger.json`) records for each attempt:
-  - Kaggle kernel slug, version, and URL (explicitly passed or resolved);
+  - Kaggle kernel slug, version, and URL (mandatory `--kernel-id` argument passed to `execute-all`);
   - Attempt number (1 or 2);
   - Start and end UTC timestamps;
   - Governing preregistration SHA-256 and driver SHA-256;

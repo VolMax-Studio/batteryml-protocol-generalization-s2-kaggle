@@ -37,10 +37,11 @@
       "rationale": "In S1, Variance under B is strictly lower than under A (133.476 < 136.130). If S2 reproduces Variance within the 1.0% cross-environment tolerance, Trigger 3 is guaranteed to be false prior to run. It remains implemented in code for exhaustive protocol fidelity, but carries no independent confirmatory weight."
     }
   },
+  "derived_from": "batteryml-protocol-generalization-s2-kaggle@2ad8e8cd7430dec78be588f21e7c374b2c75c886",
   "scientific_run_executed": false,
   "status": "FROZEN_PRIOR_KNOWLEDGE_BOUNDARY",
   "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
-  "timestamp_utc": "2026-09-16T16:44:38.377897+00:00",
+  "timestamp_utc": "2026-09-16T18:50:00.000000+00:00",
   "unverified_models_and_metrics": {
     "primary83_ridge_b": "exposure: unverified",
     "primary83_xgb_a": "exposure: unverified",

@@ -4,7 +4,10 @@
     "rationale": "Prevents XGBoost from altering threading semantics across hosts with differing core counts while preserving upstream model code.",
     "required_logical_cpus": 4
   },
+  "derived_from": "batteryml-protocol-generalization-s2-kaggle@2ad8e8cd7430dec78be588f21e7c374b2c75c886",
   "memory_admission": {
+    "cgroup_memory_limit_bytes": 32212254720,
+    "cgroup_memory_limit_context": "Host MemTotal is 33659383808 bytes (31.35 GiB), satisfying the >=31 GiB hardware admission rule. The container cgroup memory.max is 32212254720 bytes (30.00 GiB), providing >3.5x headroom over peak ~8 GiB preprocessing and ~4 GiB training workloads.",
     "cgroup_memory_limit_tracking": {
       "rule": "Record exact cgroup memory limit if constrained; fail-closed if below minimum RAM.",
       "sources": [
@@ -29,7 +32,7 @@
   "scientific_run_executed": false,
   "status": "FROZEN_ENVIRONMENT_RESOURCE_RECEIPT",
   "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
-  "timestamp_utc": "2026-09-16T16:45:41.240573+00:00",
+  "timestamp_utc": "2026-09-16T18:50:00.000000+00:00",
   "xgboost_resolved_parameters": {
     "base_score": null,
     "booster": null,

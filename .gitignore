@@ -2,6 +2,4 @@ __pycache__/
 *.pyc
 attempt-001-output/
 smoke-test-output/
-kaggle-s2-execution/
-kaggle-s2_1-smoke-test/
 .venv/

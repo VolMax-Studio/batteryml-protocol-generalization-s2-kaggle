@@ -2,7 +2,7 @@
   "attempt_ledger_schema": {
     "disposition_values": [
       "GOVERNING_COMPLETE",
-      "FAILED_PLATFORM_RETRY_ALLOWED",
+      "FAILED_PENDING_OPERATOR_CLASSIFICATION",
       "EXECUTION_BLOCKED_RESOURCE"
     ],
     "required_fields": [
@@ -17,10 +17,11 @@
       "generated_receipts"
     ]
   },
+  "derived_from": "batteryml-protocol-generalization-s2-kaggle@2ad8e8cd7430dec78be588f21e7c374b2c75c886",
   "max_scientific_attempts": 2,
   "rules": {
     "attempt_001": "Initial complete execution attempt across all 12 runs.",
-    "attempt_002_conditions": "Attempt 002 is permitted ONLY IF Attempt 001 fails to complete all twelve runs due to platform/resource failure (e.g., host OOM, platform timeout, unexpected container termination).",
+    "attempt_002_conditions": "Attempt 002 is permitted ONLY IF Attempt 001 fails to complete all twelve runs and the Operator formally classifies the failure under [L3] as a platform/resource failure (e.g., host OOM, platform timeout, unexpected container termination). Any deterministic pre-scientific or code failure remains non-retryable without a new execution-repair instance.",
     "attempt_002_scope": "Attempt 002 MUST be a complete full restart of all 12 runs from the beginning under identical governing hashes and environment.",
     "governing_run": "The first complete attempt is governing.",
     "isolation_and_combination": "Partial results from different attempts are NEVER combined or spliced together. Every attempt begins in an absent namespace.",
@@ -29,5 +30,5 @@
   "scientific_run_executed": false,
   "status": "FROZEN_EXECUTION_ATTEMPT_POLICY",
   "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
-  "timestamp_utc": "2026-09-16T16:45:05.596385+00:00"
+  "timestamp_utc": "2026-09-16T18:50:00.000000+00:00"
 }

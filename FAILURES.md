@@ -9,9 +9,13 @@
 * **Execution Timestamp (UTC)**: `2026-09-16T17:58:52.502693+00:00` to `2026-09-16T17:59:00.747635+00:00`
 * **Process Exit Code**: `1`
 
-## 2. Operator [L3] Annotation
+## 2. Operator Formal Ratification of Classification
 * **Classification**: `PRE-SCIENTIFIC_EXECUTION_FAILURE`
-* **Explanation**: The failure occurred inside the preflight environment admission check of child process `00-preprocess` prior to directory creation (`PROCESSED.mkdir`) or loading of any MATR raw files (`load_batch`). The driver recorded `FAILED_PLATFORM_RETRY_ALLOWED` in `attempt-ledger.json` via its generic top-level exception handler, but the root cause is a deterministic environment admission check mismatch rather than an ephemeral platform/resource exhaustion.
+* **Operator**: `Ivan Nestorov, Operator / Final Ratifier`
+* **Statement Location**: `antigravity-conversation-15abadc7-f175-429d-ba47-9d1ff85d1b74`
+* **Operator Verbatim Statement**:
+  > *"Ratifikujem klasifikaciju batteryml-protocol-generalization-s2-kaggle Attempt 001 kao PRE-SCIENTIFIC_EXECUTION_FAILURE. Attempt 001 nije proizveo nove naučne rezultate, predikcije ni metrike. Raw .mat fajlovi jesu heširani tokom preflight verifikacije, ali nisu učitani u BatteryML preprocessing pipeline. Ova klasifikacija ne autorizuje retry unutar zatvorenog S2."*
+* **Explanation**: The failure occurred inside the preflight environment admission check of child process `00-preprocess` prior to directory creation (`PROCESSED.mkdir`) or loading of any MATR raw files into the BatteryML preprocessing pipeline (`load_batch`). The driver recorded `FAILED_PLATFORM_RETRY_ALLOWED` in `attempt-ledger.json` via its generic top-level exception handler, but the root cause is a deterministic environment admission check mismatch rather than an ephemeral platform/resource exhaustion.
 
 ## 3. Failure Mechanism
 1. Parent process (`execute-all`) successfully verified the clean Kaggle base image environment via `verify_environment()` (872 pip freeze packages, SHA-256: `e137b12924bbb4fbb83f45c8ccb3419ba4e5556d01d977a05a7ab4e175155c35`).
@@ -23,11 +27,11 @@
    `RuntimeError: base pip freeze mismatch: lines=874, sha256=4f0dd37803d994f223f417f9928fcc2a16f265eb9b968ab3d0da36c9b3d1066b`
 
 ## 4. Scientific Exposure Assessment
-* **Data Ingestion**: Zero. No `.mat` files opened. `clean_batches` was never called.
+* **Raw Data Handling**: Raw `.mat` files were hashed in binary read mode during preflight input verification (`verify_inputs()`), but were never loaded or parsed for preprocessing or feature extraction. `load_batch` and `clean_batches` were never called.
 * **Model Training**: Zero. No models instantiated or fit.
 * **Metric Calculation**: Zero. No RMSE or MAE evaluated.
 * **Scientific Gate Triggers**: Unadjudicated.
-* **Conclusion**: Complete preservation of study blindness. No scientific penalty incurred.
+* **Exposure Disposition**: No additional scientific exposure from S2 Attempt 001 beyond the previously known S1 exposed metrics.
 
 ## 5. Artifact Custody & Re-hash
 Downloaded artifact tree from `volmax1/batteryml-s2-attempt-001` verified locally:
