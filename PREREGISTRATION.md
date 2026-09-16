@@ -39,15 +39,22 @@ not assert that BatteryML is invalid.
   `9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba`.
 - MATR batch2 SHA-256:
   `63ab200d09ecb237fee5ef3a5c5db76e3212e3206a0bd92f769e1427fed338b8`.
+- Kaggle raw source: `rickandjoe/mit-battery-degradation-dataset`.
+- Mounted raw filenames:
+  `2017-05-12_batchdata_updated_struct_errorcorrect.mat` and
+  `2017-06-30_batchdata_updated_struct_errorcorrect.mat`.
+- Pre-ratification hash-only probe receipt SHA-256:
+  `d2e33a03c4f8034449f42eb5e235f5ae0279a09fa9a41b15fe0a1dfa7c9fe66a`;
+  both files matched the frozen byte sizes and SHA-256 values.
 - Split-manifest SHA-256:
   `96695e534718733469ba108ee3c1372e29351710235d5b47020f6bd9ae2ce722`.
 - Protocol identity is the exact normalized original `policy_readable` value,
   represented publicly by its SHA-256 group identifier.
 
-The private Kaggle input dataset may contain the two raw files, the exact
-tracked BatteryML source snapshot, the public S2 control files, and two
-offline dependency wheels. It may not contain S1 predictions as executable
-inputs.
+The raw files are attached read-only from the identified public Kaggle dataset.
+The private S2 control dataset may contain only the exact tracked BatteryML
+source snapshot, the public S2 control files, and two offline dependency
+wheels. It may not contain S1 predictions as executable inputs.
 
 ## Universes and assignments
 

@@ -20,10 +20,16 @@ import numpy as np
 
 
 INSTANCE = "batteryml-protocol-generalization-s2-kaggle"
-INPUT = Path(os.environ.get("S2_INPUT_ROOT", "/kaggle/input/batteryml-protocol-generalization-s2-inputs"))
+INPUT = Path(os.environ.get(
+    "S2_INPUT_ROOT",
+    "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls",
+))
+RAW = Path(os.environ.get(
+    "S2_RAW_ROOT",
+    "/kaggle/input/datasets/rickandjoe/mit-battery-degradation-dataset",
+))
 WORKING = Path(os.environ.get("S2_WORKING_ROOT", "/kaggle/working"))
 REPO = INPUT / "BatteryML"
-RAW = INPUT / "raw"
 SPLIT_MANIFEST = INPUT / "batteryml-protocol-generalization-split-manifest.csv"
 SOURCE_MANIFEST = INPUT / "batteryml-source-files.sha256"
 PREREGISTRATION = INPUT / "PREREGISTRATION.md"
@@ -41,8 +47,8 @@ MIN_RAM_BYTES = 31 * 1024**3
 MIN_CPUS = 4
 
 EXPECTED_FILES = {
-    RAW / "MATR_batch_20170512.mat": "9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba",
-    RAW / "MATR_batch_20170630.mat": "63ab200d09ecb237fee5ef3a5c5db76e3212e3206a0bd92f769e1427fed338b8",
+    RAW / "2017-05-12_batchdata_updated_struct_errorcorrect.mat": "9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba",
+    RAW / "2017-06-30_batchdata_updated_struct_errorcorrect.mat": "63ab200d09ecb237fee5ef3a5c5db76e3212e3206a0bd92f769e1427fed338b8",
     SPLIT_MANIFEST: EXPECTED_SPLIT_SHA,
     SOURCE_MANIFEST: EXPECTED_SOURCE_MANIFEST_SHA,
     REPO / "configs/baselines/sklearn/variance_model/matr_1.yaml": "ab0849c3a021273629c1a6e90c09aa29eb425fdfb17aef2376888524f6984b5b",
@@ -172,7 +178,11 @@ def verify_inputs() -> dict[str, object]:
         actual = sha256(path)
         if actual != expected:
             raise RuntimeError(f"SHA-256 mismatch for {path}: {actual}")
-        hashes[str(path.relative_to(INPUT))] = actual
+        try:
+            label = str(path.relative_to(INPUT))
+        except ValueError:
+            label = f"public-raw/{path.name}"
+        hashes[label] = actual
     return {"hashes": hashes, "source": verify_source_snapshot()}
 
 
@@ -315,8 +325,8 @@ def command_preprocess(args: argparse.Namespace) -> None:
 
     preprocessor = BasePreprocessor(output_dir=str(PROCESSED), silent=True)
     batches = [
-        load_batch(RAW / "MATR_batch_20170512.mat", 1),
-        load_batch(RAW / "MATR_batch_20170630.mat", 2),
+        load_batch(RAW / "2017-05-12_batchdata_updated_struct_errorcorrect.mat", 1),
+        load_batch(RAW / "2017-06-30_batchdata_updated_struct_errorcorrect.mat", 2),
     ]
     clean_batches(batches, preprocessor.dump_single_file, True)
     rows = processed_rows()

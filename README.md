@@ -29,12 +29,18 @@ protocols. It does not characterize the original benchmark as data leakage.
 - `PREREGISTRATION.md` — governing S2 design candidate.
 - `ENVIRONMENT.md` — observed Kaggle host and closure rules.
 - `environment-lock.txt` — exact relevant versions and closure hashes.
+- `raw-hash-probe.json` — Kaggle-side byte-identity receipt for raw inputs.
+- `compatibility-probe.json` — import and estimator-constructor smoke receipt.
+- `driver-verify.json` — full frozen-driver pre-run verification receipt.
 - `batteryml-protocol-generalization-split-manifest.csv` — frozen assignments.
 - `batteryml-source-files.sha256` — pinned BatteryML source manifest.
 - `s2_kaggle_driver.py` — fail-closed execution driver.
 
 Raw HDF5 inputs, private Kaggle dataset material, credentials, and S1 local
-scratch data are intentionally excluded from this public repository.
+scratch data are intentionally excluded from this public repository. S2 reads
+the raw files from Kaggle dataset `rickandjoe/mit-battery-degradation-dataset`;
+a hash-only probe independently established byte identity with the frozen local
+inputs before ratification.
 
 ## Prior knowledge boundary
 
@@ -47,4 +53,3 @@ Before S2 was designed, S1 had already exposed three results:
 | Ridge A | 115.7892 | 80.4132 |
 
 They are disclosed as prior knowledge and are not S2 execution results.
-

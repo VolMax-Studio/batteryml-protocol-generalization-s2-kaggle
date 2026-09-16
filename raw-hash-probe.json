@@ -1,0 +1,21 @@
+{
+  "all_match": true,
+  "dataset_source": "rickandjoe/mit-battery-degradation-dataset",
+  "observed": {
+    "2017-05-12_batchdata_updated_struct_errorcorrect.mat": {
+      "match": true,
+      "path": "/kaggle/input/datasets/rickandjoe/mit-battery-degradation-dataset/2017-05-12_batchdata_updated_struct_errorcorrect.mat",
+      "sha256": "9d928ab978f0e3c70b31cb833a749fedd35094d01af76475d69b40aa3497f5ba",
+      "size": 3025320241
+    },
+    "2017-06-30_batchdata_updated_struct_errorcorrect.mat": {
+      "match": true,
+      "path": "/kaggle/input/datasets/rickandjoe/mit-battery-degradation-dataset/2017-06-30_batchdata_updated_struct_errorcorrect.mat",
+      "sha256": "63ab200d09ecb237fee5ef3a5c5db76e3212e3206a0bd92f769e1427fed338b8",
+      "size": 2007331155
+    }
+  },
+  "probe_only": true,
+  "scientific_run_executed": false,
+  "timestamp_utc": "2026-09-16T15:15:28.081100+00:00"
+}
