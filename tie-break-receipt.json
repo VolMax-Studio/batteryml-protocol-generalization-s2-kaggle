@@ -1,0 +1,27 @@
+{
+  "algorithm": "NFKC-strip policy string order; minimum moves; lexicographic bits train=0,test=1",
+  "classification": "OBSERVED",
+  "frozen_manifest_sha256": "96695e534718733469ba108ee3c1372e29351710235d5b47020f6bd9ae2ce722",
+  "manifest_byte_identical_match": true,
+  "original_generator": "extract_matr_primary_metadata.py",
+  "original_generator_sha256": "d8d2fa56596e608cc8eb45b0d631c84d7568917d61ef1aa571e0f46b9de70efd",
+  "original_metadata": "primary_pool_84_metadata.csv",
+  "original_metadata_sha256": "d9332d95468d9c9a767f42363d9b09612f17f2af518de24e728ed05e2056c753",
+  "regenerated_manifest_sha256": "96695e534718733469ba108ee3c1372e29351710235d5b47020f6bd9ae2ce722",
+  "scientific_run_executed": false,
+  "universes": {
+    "primary83": {
+      "exact_ordered_cell_match": true,
+      "minimum_total_moves": 20,
+      "test_count": 42,
+      "train_count": 41
+    },
+    "sensitivity84": {
+      "exact_ordered_cell_match": true,
+      "minimum_total_moves": 20,
+      "test_count": 43,
+      "train_count": 41
+    }
+  },
+  "verifier_sha256": "4aabd2efa9f9513c5b59a3aff26ccd0aa5c3fc3e69435164b1e018118da51739"
+}

@@ -18,7 +18,7 @@ Before this S2 freeze, the following S1 results were known from the partial S1 r
 In S1, Variance under B was strictly lower (better) than under A (relative change −1.9493%,
 `RMSE_B < RMSE_A`).
 
-The remaining model cells have not been exposed:
+Exposure status for the remaining model cells is unverified.
 - Primary83 Ridge B: `exposure: unverified`;
 - Primary83 XGBoost A: `exposure: unverified`;
 - Primary83 XGBoost B: `exposure: unverified`;
@@ -96,11 +96,23 @@ wheels. It may not contain S1 predictions as executable inputs.
 Dynamic programming and combinatorial enumeration confirm:
 - In both universes, the minimum number of cell moves from A to achieve protocol-disjointness is exactly **20**.
 - There exist **185,471** distinct minimal-cost protocol-disjoint assignments for `primary83`, and **190,476** for `sensitivity84`.
-- Split B is **not** a unique "natural" partition; it is one specific assignment selected by the deterministic, self-contained lexicographic tie-break algorithm:
-  1. Primary universe assignments are initialized from Split A (`MATRPrimaryTestTrainTestSplitter`).
-  2. The objective function strictly minimizes cell transitions between train and test such that no normalized `policy_readable` protocol-group SHA-256 appears in both sets, while preserving exact partition sizes (41 train / 42 test for primary83; 41 train / 43 test for sensitivity84).
-  3. Among all 185,471 (or 190,476) partitions achieving the optimal cost of 20 cell moves, the tie-break deterministically selects the lexicographically earliest assignment ordered by `(protocol_group_sha256, cell_id)`.
-  4. This algorithm is self-contained and does not depend on S1 references.
+- Split B is **not** a unique "natural" partition; it is the assignment reproduced by the original metadata-gate construction:
+  1. For each universe independently, use its frozen Split A membership and positions (41 train / 42 test for primary83; 41 train / 43 test for sensitivity84).
+  2. Define protocol identity as `unicodedata.normalize("NFKC", policy_readable).strip()`. Group cells by that exact string; sort the distinct normalized strings lexicographically using Python string order. SHA-256 identifies a protocol but does not determine group order.
+  3. Assign each whole group to train (`0`) or test (`1`), preserving the exact A train/test counts. Minimize the number of cells whose side changes relative to A.
+  4. Among equal minimum-cost assignments, choose the lexicographically smallest group-assignment bit vector in the string order from step 2, with `0 < 1`. Dynamic programming retains the minimum `(move_cost, bit_vector)` for each reachable test-cell count after each group. Assigning a group to train costs its A-test count; assigning it to test costs its A-train count and adds its full size to the test count. Initialize test count zero with `(0, ())`; select the exact target test count after the last group.
+  5. Sort B train and B test cell IDs independently using Python string order; assign zero-based positions. Serialize rows in universe order `primary83`, `sensitivity84`, then lexicographic cell-ID order, using the frozen CSV column order, UTF-8, comma delimiters and CRLF line endings (including the final line). A positions are preserved.
+
+The read-only `tie_break_verifier.py` includes the normalized protocol identities,
+checks their SHA-256 identifiers against the frozen manifest, and regenerates B
+using only A membership and protocol identity before comparing with frozen B.
+Its optimization functions are copied from the original metadata-gate generator
+`extract_matr_primary_metadata.py`, SHA-256
+`d8d2fa56596e608cc8eb45b0d631c84d7568917d61ef1aa571e0f46b9de70efd`.
+The verifier is self-contained and requires no S1 runtime or scientific execution.
+Run `python3 tie_break_verifier.py` to emit the receipt; `tie-break-receipt.json`
+records exact ordered-cell matches for both universes and byte-identical
+regeneration of the complete frozen manifest.
 
 ### Primary universe (83 cells)
 
