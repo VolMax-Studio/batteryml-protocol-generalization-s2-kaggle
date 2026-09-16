@@ -1,0 +1,44 @@
+{
+  "comparison": {
+    "command_semantics": "cmp Kaggle runtime listing bytes against canonical listing bytes from explicit control-dataset v7 download",
+    "exit_code": 0,
+    "result": "BYTE_IDENTICAL"
+  },
+  "downloaded_v7": {
+    "archive_sha256": "4db224463d943ce6777311a433bf7440c36d82e2f7468759478af547663fd751",
+    "dataset_version": 7,
+    "file_count": 223,
+    "listing_bytes": 25157,
+    "listing_sha256": "1fd46b85d24f3b0b64083fda9593ccf36db4fb1ae2b0bbf0966d5633ac5acc3e",
+    "ratification_receipt_disposition": "Belongs to predecessor S2 instance; not relied upon for S2.1 authorization",
+    "ratification_receipt_sha256": "f6abdb3733073e6a5de4caa110f7d9d0f135bd86e5ba2b64963a5dfde9c71ecd"
+  },
+  "governing_artifacts_unchanged": {
+    "preregistration_sha256": "6b027e7426a51caae616b4721bddbe4b62f368e4d17ae659de0399c7b215d92f",
+    "runner_sha256": "fd74df3b17b2ea082041ca50d35b0c8a6015df7f8c87f4f502f4a472340d939a",
+    "scientific_driver_sha256": "c943e1d52478bbec578ec1d06dcbc84b627f33f3e73e3edd18a38c43dbfc65b9"
+  },
+  "kaggle_probe": {
+    "completed_at_utc": "2026-09-16T21:33:43.980673+00:00",
+    "configured_dataset_slug": "volmax1/batteryml-protocol-generalization-s2-controls",
+    "file_count": 223,
+    "kernel_slug": "volmax1/batteryml-s2-control-mount-listing-probe",
+    "kernel_status": "COMPLETE",
+    "kernel_url": "https://www.kaggle.com/code/volmax1/batteryml-s2-control-mount-listing-probe",
+    "kernel_version": 1,
+    "listing_bytes": 25157,
+    "listing_sha256": "1fd46b85d24f3b0b64083fda9593ccf36db4fb1ae2b0bbf0966d5633ac5acc3e",
+    "mount_path": "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls",
+    "output_json_sha256": "f3d8bedd9f078fcefad640e4b1376daf6fcff0020887a1178a45bcd905afc8b4",
+    "output_listing_sha256": "1fd46b85d24f3b0b64083fda9593ccf36db4fb1ae2b0bbf0966d5633ac5acc3e",
+    "raw_matr_data_accessed": false,
+    "scientific_driver_executed": false,
+    "scientific_run_executed": false
+  },
+  "method_equivalence": {
+    "deterministic_listing_ast_equal_to_governing_runner": true,
+    "probe_script_sha256": "0495b28b05ea58f93bb8b06040f26b6dd4c8f7c516c73f8ff86911c3a898602b"
+  },
+  "status": "PASS_B_L_MOUNT_LISTING_EQUIVALENCE",
+  "study_instance": "batteryml-protocol-generalization-s2.1-kaggle"
+}
