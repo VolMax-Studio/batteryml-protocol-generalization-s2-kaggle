@@ -35,7 +35,20 @@
     "resolution": "Not relied upon; the frozen procedure uses explicit-version content matching instead"
   },
   "legacy_smoke_receipt_note": "The version 4 value in smoke-test-receipt.json has no documented in-kernel measurement provenance and is not relied upon by the S2.1 binding procedure.",
-  "method": "Download an explicit published dataset version, extract it, reject symlinks, hash every regular file, serialize rows as '<sha256>  <POSIX-relative-path>\\n' sorted by relative path, then SHA-256 hash the listing bytes.",
+  "mounted_tree_probe": {
+    "byte_comparison_against_explicit_v7_download_exit_code": 0,
+    "file_count": 223,
+    "kernel_status": "COMPLETE",
+    "kernel_url": "https://www.kaggle.com/code/volmax1/batteryml-s2-control-mount-listing-probe",
+    "kernel_version": 1,
+    "listing_bytes": 25157,
+    "listing_sha256": "1fd46b85d24f3b0b64083fda9593ccf36db4fb1ae2b0bbf0966d5633ac5acc3e",
+    "mount_path": "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls",
+    "result": "PASS_MOUNT_AND_EXPLICIT_DOWNLOAD_LISTINGS_BYTE_IDENTICAL",
+    "scientific_run_executed": false
+  },
+  "old_v7_ratification_receipt_note": "The v7 ratification receipt is for the predecessor instance batteryml-protocol-generalization-s2-kaggle, not S2.1, and is not relied upon for S2.1 authorization.",
+  "method": "Download an explicit published dataset version, extract it, reject symlinks, hash every regular file, serialize rows as '<sha256>  <POSIX-relative-path>\n' sorted by relative path, then SHA-256 hash the listing bytes.",
   "official_cli_observation": {
     "dataset_download_support": "Dataset identifiers accept owner/slug/version and populate dataset_version_number in the download request",
     "get_kernel_metadata_dataset_field": "dataset_data_sources is a list of source slugs without version numbers",
