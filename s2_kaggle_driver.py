@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 
 
-INSTANCE = "batteryml-protocol-generalization-s2-kaggle"
+INSTANCE = "batteryml-protocol-generalization-s2.1-kaggle"
 INPUT = Path(os.environ.get(
     "S2_INPUT_ROOT",
     "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls",
@@ -121,8 +121,9 @@ def cgroup_memory_limit_bytes() -> int | None:
 
 
 def pip_freeze_sha() -> tuple[int, str]:
+    sanitized_env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
     text = subprocess.check_output(
-        [sys.executable, "-m", "pip", "freeze"], text=True
+        [sys.executable, "-m", "pip", "freeze"], text=True, env=sanitized_env
     )
     if not text.endswith("\n"):
         text += "\n"
@@ -317,6 +318,17 @@ def activate_extras() -> None:
         raise RuntimeError("addict version mismatch")
     if str(getattr(fire, "__version__", "0.7.1")) != "0.7.1":
         raise RuntimeError("fire version mismatch")
+    addict_path = Path(getattr(addict, "__file__", "")).resolve()
+    fire_path = Path(getattr(fire, "__file__", "")).resolve()
+    site_resolved = SITE.resolve()
+    if not str(addict_path).startswith(str(site_resolved)):
+        raise RuntimeError(
+            f"addict provenance violation: loaded from {addict_path}, expected within {site_resolved}"
+        )
+    if not str(fire_path).startswith(str(site_resolved)):
+        raise RuntimeError(
+            f"fire provenance violation: loaded from {fire_path}, expected within {site_resolved}"
+        )
 
 
 def processed_rows() -> list[tuple[str, str]]:
@@ -618,8 +630,11 @@ def command_execute_all(args: argparse.Namespace) -> None:
     ARTIFACT.mkdir(parents=True, exist_ok=False)
 
     start_time = utcnow()
-    kernel_id = os.environ.get("KAGGLE_KERNEL_RUN_TYPE", "") or os.environ.get(
-        "KAGGLE_URL", "kaggle-cpu-session"
+    kernel_id = (
+        getattr(args, "kernel_id", "")
+        or os.environ.get("KAGGLE_KERNEL_RUN_SLUG_OR_URL", "").strip()
+        or os.environ.get("KAGGLE_URL", "").strip()
+        or os.environ.get("KAGGLE_KERNEL_RUN_TYPE", "kaggle-cpu-session")
     )
     ledger_entry: dict[str, object] = {
         "attempt_number": attempt,
@@ -885,6 +900,52 @@ def command_verify_determinism(_: argparse.Namespace) -> None:
         shutil.rmtree(base_tmp)
 
 
+def command_smoke_test_child(args: argparse.Namespace) -> None:
+    """Parent smoke test verifying parent->child invocation passes environment admission under PYTHONPATH=SITE."""
+    environment = verify_environment()
+    inputs = verify_inputs()
+    if ARTIFACT.exists() or SITE.exists():
+        raise RuntimeError("refusing pre-existing smoke test namespace")
+    ARTIFACT.mkdir(parents=True, exist_ok=False)
+    extras = install_extras()
+    receipt_path = ARTIFACT / "smoke-test-child-receipt.json"
+    run_child(
+        ["smoke-test-child-worker"],
+        "smoke-test-child",
+        receipt_path,
+    )
+    result = {
+        "timestamp_utc": utcnow(),
+        "status": "PASS",
+        "scope": "parent_to_child_environment_admission",
+        "parent_environment": environment,
+        "parent_inputs": inputs,
+        "offline_extras": extras,
+        "child_receipt": json.loads(receipt_path.read_text()),
+    }
+    (ARTIFACT / "smoke-test-parent-receipt.json").write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n"
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_smoke_test_child_worker(_: argparse.Namespace) -> None:
+    """Child worker for smoke test: verifies environment and activates extras under child PYTHONPATH."""
+    environment = verify_environment()
+    activate_extras()
+    receipt = {
+        "timestamp_utc": utcnow(),
+        "status": "PASS",
+        "child_pid": os.getpid(),
+        "pythonpath": os.environ.get("PYTHONPATH", ""),
+        "environment": environment,
+    }
+    (ARTIFACT / "smoke-test-child-receipt.json").write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    )
+    print(json.dumps(receipt, indent=2, sort_keys=True))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -902,12 +963,18 @@ def parse_args() -> argparse.Namespace:
     execute = subparsers.add_parser("execute-all")
     execute.add_argument("--ratification-receipt", type=Path, required=True)
     execute.add_argument("--attempt", type=int, choices=[1, 2], default=1)
+    execute.add_argument("--kernel-id", type=str, default="")
     execute.set_defaults(func=command_execute_all)
     det = subparsers.add_parser("verify-determinism")
     det.set_defaults(func=command_verify_determinism)
+    smoke = subparsers.add_parser("smoke-test-child")
+    smoke.set_defaults(func=command_smoke_test_child)
+    worker = subparsers.add_parser("smoke-test-child-worker")
+    worker.set_defaults(func=command_smoke_test_child_worker)
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     parsed = parse_args()
     parsed.func(parsed)
+

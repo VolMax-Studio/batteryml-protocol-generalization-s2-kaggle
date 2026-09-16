@@ -39,7 +39,7 @@
   },
   "scientific_run_executed": false,
   "status": "FROZEN_PRIOR_KNOWLEDGE_BOUNDARY",
-  "study_instance": "batteryml-protocol-generalization-s2-kaggle",
+  "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
   "timestamp_utc": "2026-09-16T16:44:38.377897+00:00",
   "unverified_models_and_metrics": {
     "primary83_ridge_b": "exposure: unverified",

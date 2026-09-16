@@ -1,0 +1,48 @@
+{
+  "child_execution": {
+    "child_pid": 28,
+    "environment": {
+      "base_pip_freeze_lines": 872,
+      "base_pip_freeze_sha256": "e137b12924bbb4fbb83f45c8ccb3419ba4e5556d01d977a05a7ab4e175155c35",
+      "cgroup_memory_limit_bytes": 32212254720,
+      "cuda_available": false,
+      "exact_cpu_admission_pass": true,
+      "logical_cpus": 4,
+      "ram_total_bytes": 33659383808,
+      "versions": {
+        "h5py": "3.16.0",
+        "numba": "0.60.0",
+        "numpy": "2.0.2",
+        "pandas": "2.3.3",
+        "python": "3.12.13",
+        "scipy": "1.16.3",
+        "sklearn": "1.6.1",
+        "torch": "2.10.0+cpu",
+        "xgboost": "3.2.0"
+      }
+    },
+    "pythonpath": "/kaggle/working/s2-site-packages",
+    "status": "PASS",
+    "timestamp_utc": "2026-09-16T18:37:04.894370+00:00"
+  },
+  "kaggle_kernel_run": {
+    "kernel_slug": "volmax1/batteryml-s2-1-smoke-test",
+    "kernel_url": "https://www.kaggle.com/code/volmax1/batteryml-s2-1-smoke-test",
+    "platform": "Kaggle CPU host"
+  },
+  "module_provenance": {
+    "addict_file_prefix": "/kaggle/working/s2-site-packages",
+    "fire_file_prefix": "/kaggle/working/s2-site-packages",
+    "provenance_verified": true
+  },
+  "receipt_hashes": {
+    "child_receipt_sha256": "34b1b239342a13684cf89ccea877a96b63cd4b52b983980a2aa6394602f7f98a",
+    "kernel_log_sha256": "54071546df8a1450a14bb0e26764ea8c123455672e52a36fba038857920498ca",
+    "parent_receipt_sha256": "f34c697cd7df90a8dbad0ef5c14ec335a6a798a5c15b5aa98ea906e32b3c2671",
+    "smoke_test_report_sha256": "25a216b0b4872b4f2ab3997628a5f7015ce49f22fed8bb4e4890740c31f1ed28"
+  },
+  "scientific_run_executed": false,
+  "status": "PASS",
+  "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
+  "timestamp_utc": "2026-09-16T18:37:05.682035+00:00"
+}

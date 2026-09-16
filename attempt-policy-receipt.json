@@ -28,6 +28,6 @@
   },
   "scientific_run_executed": false,
   "status": "FROZEN_EXECUTION_ATTEMPT_POLICY",
-  "study_instance": "batteryml-protocol-generalization-s2-kaggle",
+  "study_instance": "batteryml-protocol-generalization-s2.1-kaggle",
   "timestamp_utc": "2026-09-16T16:45:05.596385+00:00"
 }
