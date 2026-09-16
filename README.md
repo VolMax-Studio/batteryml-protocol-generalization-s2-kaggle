@@ -54,3 +54,13 @@ Trigger 3 is pre-exposed and carries no independent confirmatory weight because 
 - `batteryml-source-files.sha256` — pinned BatteryML source manifest.
 
 Raw HDF5 inputs, private Kaggle dataset material, credentials, and S1 local scratch data are intentionally excluded from this public repository. S2.1 reads the raw files from Kaggle dataset `rickandjoe/mit-battery-degradation-dataset` read-only; independent hash probing established byte identity with verified MATR source files before ratification.
+
+## Runtime and post-run identity binding
+
+The Kaggle runner has no pre-created authorization sidecar. At runtime it records
+the unique ratification receipt, frozen governing hashes, mount paths, and a
+canonical full-file SHA-256 listing of the mounted control dataset. Kernel and
+control-dataset version numbers are queried through the Kaggle API only after the
+run. The exact downloaded dataset version must reproduce the runtime listing
+byte-for-byte before any scientific verdict is accepted. The full fail-closed
+procedure is frozen in `PREREGISTRATION.md` under **Post-run Kaggle identity binding**.

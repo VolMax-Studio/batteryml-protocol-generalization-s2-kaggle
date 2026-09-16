@@ -14,12 +14,15 @@ from typing import Any
 
 
 INSTANCE = "batteryml-protocol-generalization-s2.1-kaggle"
+KERNEL_SLUG = "volmax1/batteryml-s2-1-execution-run"
+KERNEL_URL = f"https://www.kaggle.com/code/{KERNEL_SLUG}"
 CONTROL_DATASET_SLUG = "volmax1/batteryml-protocol-generalization-s2-controls"
-EXPECTED_PREREG_SHA256 = "e573ff930e51c445e66724a37ec681873c6ea2fe7bf89d9962b817fdb5847e09"
+EXPECTED_PREREG_SHA256 = "f627715c69404697a2bab6bb675895109d4f8c78724758fb6f7451f10df99666"
 EXPECTED_DRIVER_SHA256 = "c943e1d52478bbec578ec1d06dcbc84b627f33f3e73e3edd18a38c43dbfc65b9"
 EXPECTED_SPLIT_MANIFEST_SHA256 = "96695e534718733469ba108ee3c1372e29351710235d5b47020f6bd9ae2ce722"
-AUTHORIZATION_FILENAME = "execution-authorization.json"
-CONTROL_VERSION_FILENAME = "control-dataset-version.json"
+KERNEL_ID_PENDING = (
+    f"{KERNEL_SLUG}/POST_RUN_API_BINDING_PENDING ({KERNEL_URL})"
+)
 
 
 def utcnow() -> str:
@@ -65,65 +68,9 @@ def deterministic_listing(root: Path) -> tuple[str, str]:
     return text, hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def validate_authorization(path: Path) -> dict[str, Any]:
-    """Validate the immutable, post-ratification dispatch measurement receipt."""
-    auth = read_json(path)
-    if auth.get("schema_version") != 1 or auth.get("study_instance") != INSTANCE:
-        raise RuntimeError("Execution authorization schema or study instance mismatch")
-
-    governing = auth.get("governing")
-    if not isinstance(governing, dict):
-        raise RuntimeError("Execution authorization lacks governing hashes")
-    expected_governing = {
-        "preregistration_sha256": EXPECTED_PREREG_SHA256,
-        "driver_sha256": EXPECTED_DRIVER_SHA256,
-        "split_manifest_sha256": EXPECTED_SPLIT_MANIFEST_SHA256,
-    }
-    for key, expected in expected_governing.items():
-        if governing.get(key) != expected:
-            raise RuntimeError(f"Execution authorization {key} mismatch")
-    receipt_sha = governing.get("ratification_receipt_sha256")
-    if not isinstance(receipt_sha, str) or len(receipt_sha) != 64:
-        raise RuntimeError("Execution authorization lacks frozen ratification receipt SHA-256")
-
-    kernel = auth.get("kernel")
-    if not isinstance(kernel, dict):
-        raise RuntimeError("Execution authorization lacks measured kernel identity")
-    slug = kernel.get("slug")
-    version = kernel.get("version")
-    url = kernel.get("url")
-    if not isinstance(slug, str) or slug.count("/") != 1:
-        raise RuntimeError("Measured kernel slug is invalid")
-    if not isinstance(version, int) or isinstance(version, bool) or version < 1:
-        raise RuntimeError("Measured kernel version is invalid")
-    if url != f"https://www.kaggle.com/code/{slug}":
-        raise RuntimeError("Measured kernel URL does not match measured slug")
-    if kernel.get("measurement_source") != "kaggle_api":
-        raise RuntimeError("Kernel identity was not measured through the Kaggle API")
-    if not isinstance(kernel.get("measured_at_utc"), str) or not kernel["measured_at_utc"].strip():
-        raise RuntimeError("Kernel identity lacks a measurement timestamp")
-
-    control = auth.get("control_dataset")
-    if not isinstance(control, dict):
-        raise RuntimeError("Execution authorization lacks measured control dataset identity")
-    if control.get("slug") != CONTROL_DATASET_SLUG:
-        raise RuntimeError("Control dataset slug mismatch")
-    if not isinstance(control.get("version"), int) or isinstance(control.get("version"), bool) or control["version"] < 1:
-        raise RuntimeError("Measured control dataset version is invalid")
-    listing_sha = control.get("listing_sha256")
-    if not isinstance(listing_sha, str) or len(listing_sha) != 64:
-        raise RuntimeError("Execution authorization lacks control dataset listing SHA-256")
-    if control.get("measurement_source") != "kaggle_api":
-        raise RuntimeError("Control dataset version was not measured through the Kaggle API")
-    if not isinstance(control.get("measured_at_utc"), str) or not control["measured_at_utc"].strip():
-        raise RuntimeError("Control dataset version lacks a measurement timestamp")
-    return auth
-
-
 def validate_control_mount(
     control_root: Path,
     receipt_path: Path,
-    auth: dict[str, Any],
 ) -> tuple[str, dict[str, Any]]:
     driver = control_root / "s2_kaggle_driver.py"
     prereg = control_root / "PREREGISTRATION.md"
@@ -132,7 +79,6 @@ def validate_control_mount(
         driver: EXPECTED_DRIVER_SHA256,
         prereg: EXPECTED_PREREG_SHA256,
         split_manifest: EXPECTED_SPLIT_MANIFEST_SHA256,
-        receipt_path: auth["governing"]["ratification_receipt_sha256"],
     }
     for path, expected in expected_files.items():
         if not path.is_file() or sha256_file(path) != expected:
@@ -148,32 +94,21 @@ def validate_control_mount(
     for key, expected in required_receipt.items():
         if receipt.get(key) != expected:
             raise RuntimeError(f"Ratification receipt {key} mismatch")
-
-    version_path = control_root / CONTROL_VERSION_FILENAME
-    if not version_path.is_file():
-        raise RuntimeError(f"Missing mounted dataset version receipt: {version_path}")
-    version_receipt = read_json(version_path)
-    control = auth["control_dataset"]
-    required_version_fields = {
-        "slug": control["slug"],
-        "version": control["version"],
-        "measurement_source": control["measurement_source"],
-        "measured_at_utc": control["measured_at_utc"],
-    }
-    for key, expected in required_version_fields.items():
-        if version_receipt.get(key) != expected:
-            raise RuntimeError(f"Mounted control dataset version receipt {key} mismatch")
+    for key in (
+        "operator",
+        "ratified_at",
+        "operator_verbatim_statement",
+        "operator_statement_location",
+    ):
+        if not receipt.get(key, "").strip():
+            raise RuntimeError(f"Ratification receipt lacks {key}")
 
     listing_text, listing_sha = deterministic_listing(control_root)
-    if listing_sha != control["listing_sha256"]:
-        raise RuntimeError("Mounted control dataset listing SHA-256 mismatch")
-
     mount_receipt = {
-        "slug": control["slug"],
-        "version": control["version"],
-        "version_receipt_path": str(version_path),
-        "version_receipt_sha256": sha256_file(version_path),
+        "configured_slug": CONTROL_DATASET_SLUG,
         "mount_path": str(control_root),
+        "version": None,
+        "version_binding_status": "POST_RUN_API_BINDING_PENDING",
         "listing_sha256": listing_sha,
         "file_count": len(listing_text.splitlines()),
     }
@@ -189,13 +124,6 @@ def main() -> None:
     input_root = Path("/kaggle/input")
     working = Path("/kaggle/working")
     report_path = working / "EXECUTION_REPORT.json"
-
-    authorization_path = Path(__file__).resolve().with_name(AUTHORIZATION_FILENAME)
-    if not authorization_path.is_file():
-        raise RuntimeError(
-            "Missing post-ratification execution-authorization.json; kernel identity is unmeasured"
-        )
-    auth = validate_authorization(authorization_path)
 
     driver_candidates = sorted(input_root.rglob("s2_kaggle_driver.py"))
     if len(driver_candidates) != 1:
@@ -219,7 +147,7 @@ def main() -> None:
         raise RuntimeError(f"Expected exactly one MATR batch1 file, found {len(raw_candidates)}")
     raw_root = raw_candidates[0].parent
 
-    listing_text, control_mount = validate_control_mount(control_root, receipt_path, auth)
+    listing_text, control_mount = validate_control_mount(control_root, receipt_path)
     listing_path = working / "control-dataset-files.sha256"
     listing_path.write_text(listing_text)
 
@@ -228,8 +156,6 @@ def main() -> None:
         if path.exists():
             raise RuntimeError(f"Pre-existing namespace path found: {path}")
 
-    kernel = auth["kernel"]
-    kernel_id = f"{kernel['slug']}/{kernel['version']} ({kernel['url']})"
     cmd = [
         sys.executable,
         str(driver),
@@ -239,23 +165,32 @@ def main() -> None:
         "--attempt",
         "1",
         "--kernel-id",
-        kernel_id,
+        KERNEL_ID_PENDING,
     ]
     report: dict[str, Any] = {
         "runner_preflight_utc": utcnow(),
-        "status": "PREFLIGHT_PASS",
+        "status": "PREFLIGHT_PASS_API_BINDING_PENDING",
         "scientific_run_executed": False,
         "driver_process_started": False,
-        "kernel": kernel,
+        "post_run_api_binding_required": True,
+        "kernel_binding": {
+            "configured_slug": KERNEL_SLUG,
+            "configured_url": KERNEL_URL,
+            "version": None,
+            "status": "POST_RUN_API_BINDING_PENDING",
+        },
         "control_dataset_mount": control_mount,
         "control_dataset_listing": listing_text,
+        "control_dataset_listing_sha256": control_mount["listing_sha256"],
         "control_dataset_listing_path": str(listing_path),
-        "execution_authorization_path": str(authorization_path),
-        "execution_authorization_sha256": sha256_file(authorization_path),
         "ratification_receipt_path": str(receipt_path),
         "ratification_receipt_sha256": sha256_file(receipt_path),
         "runner_sha256": sha256_file(Path(__file__).resolve()),
-        "governing": auth["governing"],
+        "governing": {
+            "preregistration_sha256": EXPECTED_PREREG_SHA256,
+            "driver_sha256": EXPECTED_DRIVER_SHA256,
+            "split_manifest_sha256": EXPECTED_SPLIT_MANIFEST_SHA256,
+        },
         "command": cmd,
     }
     write_report(report_path, report)
@@ -287,9 +222,13 @@ def main() -> None:
 
     report["runner_end_utc"] = utcnow()
     report["exit_code"] = returncode
-    report["status"] = "PASS" if returncode == 0 else "FAIL"
+    report["status"] = (
+        "SCIENTIFIC_EXECUTION_COMPLETE_API_BINDING_PENDING"
+        if returncode == 0
+        else "DRIVER_FAILED_API_BINDING_PENDING"
+    )
     artifact_dir = working / "s2-artifact"
-    if returncode == 0 and artifact_dir.is_dir():
+    if artifact_dir.is_dir():
         for name in ("completion-receipt.json", "adjudication.json", "attempt-ledger.json"):
             path = artifact_dir / name
             if path.is_file():
@@ -297,6 +236,7 @@ def main() -> None:
         manifest_path = artifact_dir / "artifact-files.sha256"
         if manifest_path.is_file():
             report["artifact_manifest_content"] = manifest_path.read_text()
+    if returncode == 0 and (artifact_dir / "completion-receipt.json").is_file():
         report["scientific_run_executed"] = True
     write_report(report_path, report)
     print(f"[{utcnow()}] [S2-EXECUTE] Driver return code: {returncode}")

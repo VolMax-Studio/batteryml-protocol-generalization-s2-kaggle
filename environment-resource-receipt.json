@@ -9,7 +9,7 @@
     "cgroup_memory_limit_bytes": 32212254720,
     "cgroup_memory_limit_context": "Host MemTotal is 33659383808 bytes (31.35 GiB), satisfying the >=31 GiB hardware admission rule. The container cgroup memory.max is 32212254720 bytes (30.00 GiB).",
     "cgroup_memory_limit_tracking": {
-      "rule": "Record exact cgroup memory limit if constrained; fail-closed if below minimum RAM.",
+      "rule": "Record the exact cgroup memory limit if constrained. Admission is controlled only by /proc/meminfo MemTotal >= min_ram_bytes; the cgroup value is observational and has no independent threshold in the frozen driver.",
       "sources": [
         "/sys/fs/cgroup/memory.max",
         "/sys/fs/cgroup/memory/memory.limit_in_bytes"

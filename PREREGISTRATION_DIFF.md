@@ -1,10 +1,19 @@
 # Unified Diff: S2 (`2ad8e8c`) vs S2.1 (`PREREGISTRATION.md`)
 
-This diff proves that all modifications between S2 and S2.1 are strictly confined to:
+The embedded code block records the original S2-to-S2.1 transition. It is retained
+as a historical base diff, not represented as a byte-complete diff against the
+current closure candidate. Current closure amendments are additionally confined to:
+
+- removal of unsupported memory-headroom estimates;
+- an observational-only description of the cgroup memory limit, matching the driver;
+- runner-only runtime content receipts and post-run Kaggle API identity binding;
+- explicit classification of runner failure before driver start as operational/non-attempt.
+
+Across the base transition and closure amendments, modifications are confined to:
 1. Instance name (`batteryml-protocol-generalization-s2.1-kaggle`);
 2. Documentation of the S2 Attempt 001 failure, Operator formal classification, and exact exposure status (*"no additional scientific exposure from S2 Attempt 001; raw files hashed, not loaded"*);
 3. Clarification of isolated `pip freeze` execution, module path provenance, and container cgroup memory tracking in environment admission;
-4. Updated attempt policy with initial disposition `FAILED_PENDING_OPERATOR_CLASSIFICATION` and mandatory `--kernel-id` tracking in the ledger;
+4. Updated attempt policy with initial disposition `FAILED_PENDING_OPERATOR_CLASSIFICATION`, runtime pending identity, and mandatory post-run API binding;
 5. Instance name in ratification requirements.
 
 **All scientific sections (data universes, split manifest, models, configs, seeds, metrics, triggers, and interpretation boundary) are 100% byte-identical.**

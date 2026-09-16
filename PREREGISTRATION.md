@@ -200,12 +200,40 @@ Execution is governed by a strict attempt policy frozen in `attempt-policy-recei
 - The first complete attempt is governing.
 - If Attempt 002 also fails to complete all twelve runs, the terminal disposition is **`EXECUTION_BLOCKED_RESOURCE`**.
 - An immutable attempt ledger (`attempt-ledger.json`) records for each attempt:
-  - Kaggle kernel slug, version, and URL (mandatory `--kernel-id` argument passed to `execute-all`);
+  - the configured Kaggle kernel slug and URL, with the version explicitly marked
+    `POST_RUN_API_BINDING_PENDING` during execution;
   - Attempt number (1 or 2);
   - Start and end UTC timestamps;
   - Governing preregistration SHA-256 and driver SHA-256;
   - Exit code and disposition;
   - Generated receipts, including partial/failed execution logs.
+
+Runner-only preflight failure before the scientific driver process starts is an
+operational failure and does not consume a scientific attempt. Once the runner
+starts `execute-all`, Attempt 001 is consumed and the frozen attempt policy applies.
+
+### Post-run Kaggle identity binding
+
+Kaggle kernel and control-dataset version numbers are not asserted from inside
+the running kernel. The runner records only facts available at runtime: the
+configured slugs/URLs, mount paths, the unique ratification-receipt SHA-256, and
+a canonical SHA-256 listing of every regular file in the mounted control root.
+
+After the run, and before scientific adjudication is accepted, the dispatcher must:
+
+1. query the Kaggle API for the completed kernel slug, version, URL, and status;
+2. query the Kaggle API for the attached control-dataset version;
+3. download that exact dataset version and reproduce the runner's canonical
+   listing (`SHA-256`, two spaces, POSIX relative path, newline; rows sorted by
+   POSIX relative path; symlinks inadmissible);
+4. require byte equality of the reproduced listing and equality of its SHA-256
+   with `control_dataset_listing_sha256` in `EXECUTION_REPORT.json`;
+5. bind the API observations to the execution-report SHA-256, ratification-receipt
+   SHA-256, runner SHA-256, and output-file hashes in a post-run binding receipt.
+
+Missing API observations, a non-complete kernel, or any listing/hash mismatch
+produces `EXECUTION_IDENTITY_UNBOUND`; no scientific verdict is permitted and no
+scientific retry is automatically authorized.
 
 ## Cache, isolation, and membership
 

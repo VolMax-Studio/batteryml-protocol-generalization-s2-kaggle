@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,47 +19,6 @@ SPEC.loader.exec_module(RUNNER)
 
 
 class ExecutionRunnerStaticTests(unittest.TestCase):
-    def valid_authorization(self) -> dict[str, object]:
-        return {
-            "schema_version": 1,
-            "study_instance": RUNNER.INSTANCE,
-            "governing": {
-                "preregistration_sha256": RUNNER.EXPECTED_PREREG_SHA256,
-                "driver_sha256": RUNNER.EXPECTED_DRIVER_SHA256,
-                "split_manifest_sha256": RUNNER.EXPECTED_SPLIT_MANIFEST_SHA256,
-                "ratification_receipt_sha256": "a" * 64,
-            },
-            "kernel": {
-                "slug": "volmax1/batteryml-s2-1-execution-run",
-                "version": 2,
-                "url": "https://www.kaggle.com/code/volmax1/batteryml-s2-1-execution-run",
-                "measurement_source": "kaggle_api",
-                "measured_at_utc": "2026-09-16T20:00:00+00:00",
-            },
-            "control_dataset": {
-                "slug": RUNNER.CONTROL_DATASET_SLUG,
-                "version": 8,
-                "listing_sha256": "b" * 64,
-                "measurement_source": "kaggle_api",
-                "measured_at_utc": "2026-09-16T20:00:00+00:00",
-            },
-        }
-
-    def test_authorization_accepts_complete_measured_identity(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / RUNNER.AUTHORIZATION_FILENAME
-            path.write_text(json.dumps(self.valid_authorization()))
-            self.assertEqual(RUNNER.validate_authorization(path)["kernel"]["version"], 2)
-
-    def test_authorization_rejects_unmeasured_kernel_version(self) -> None:
-        authorization = self.valid_authorization()
-        authorization["kernel"]["version"] = None  # type: ignore[index]
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / RUNNER.AUTHORIZATION_FILENAME
-            path.write_text(json.dumps(authorization))
-            with self.assertRaisesRegex(RuntimeError, "kernel version"):
-                RUNNER.validate_authorization(path)
-
     def test_listing_is_sorted_and_content_bound(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -73,24 +31,24 @@ class ExecutionRunnerStaticTests(unittest.TestCase):
             )
             self.assertEqual(len(digest), 64)
 
-    def test_control_mount_is_bound_to_receipt_version_and_listing(self) -> None:
+    def test_listing_rejects_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "file.txt").write_text("content\n")
+            (root / "link.txt").symlink_to(root / "file.txt")
+            with self.assertRaisesRegex(RuntimeError, "Symlink"):
+                RUNNER.deterministic_listing(root)
+
+    def test_control_mount_binds_governing_files_and_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             driver = root / "s2_kaggle_driver.py"
             prereg = root / "PREREGISTRATION.md"
             manifest = root / "batteryml-protocol-generalization-split-manifest.csv"
             receipt = root / "ratification-receipt.txt"
-            version_receipt = root / RUNNER.CONTROL_VERSION_FILENAME
             driver.write_text("driver\n")
             prereg.write_text("prereg\n")
             manifest.write_text("manifest\n")
-            version = {
-                "slug": RUNNER.CONTROL_DATASET_SLUG,
-                "version": 8,
-                "measurement_source": "kaggle_api",
-                "measured_at_utc": "2026-09-16T20:00:00+00:00",
-            }
-            version_receipt.write_text(json.dumps(version, sort_keys=True) + "\n")
 
             old = (
                 RUNNER.EXPECTED_DRIVER_SHA256,
@@ -106,18 +64,20 @@ class ExecutionRunnerStaticTests(unittest.TestCase):
                     f"instance={RUNNER.INSTANCE}\n"
                     f"prereg_sha256={RUNNER.EXPECTED_PREREG_SHA256}\n"
                     f"driver_sha256={RUNNER.EXPECTED_DRIVER_SHA256}\n"
+                    "operator=Ivan Nestorov\n"
+                    "ratified_at=2026-09-16T22:00:00+02:00\n"
+                    "operator_verbatim_statement=Ratified for test.\n"
+                    "operator_statement_location=test-fixture\n"
                 )
-                listing, listing_sha = RUNNER.deterministic_listing(root)
-                auth = self.valid_authorization()
-                auth["governing"]["preregistration_sha256"] = RUNNER.EXPECTED_PREREG_SHA256  # type: ignore[index]
-                auth["governing"]["driver_sha256"] = RUNNER.EXPECTED_DRIVER_SHA256  # type: ignore[index]
-                auth["governing"]["split_manifest_sha256"] = RUNNER.EXPECTED_SPLIT_MANIFEST_SHA256  # type: ignore[index]
-                auth["governing"]["ratification_receipt_sha256"] = RUNNER.sha256_file(receipt)  # type: ignore[index]
-                auth["control_dataset"]["listing_sha256"] = listing_sha  # type: ignore[index]
-                observed_listing, mount = RUNNER.validate_control_mount(root, receipt, auth)
-                self.assertEqual(observed_listing, listing)
-                self.assertEqual(mount["version"], 8)
-                self.assertEqual(mount["listing_sha256"], listing_sha)
+                expected_listing, expected_sha = RUNNER.deterministic_listing(root)
+                observed_listing, mount = RUNNER.validate_control_mount(root, receipt)
+                self.assertEqual(observed_listing, expected_listing)
+                self.assertEqual(mount["version"], None)
+                self.assertEqual(
+                    mount["version_binding_status"],
+                    "POST_RUN_API_BINDING_PENDING",
+                )
+                self.assertEqual(mount["listing_sha256"], expected_sha)
             finally:
                 (
                     RUNNER.EXPECTED_DRIVER_SHA256,
@@ -125,11 +85,46 @@ class ExecutionRunnerStaticTests(unittest.TestCase):
                     RUNNER.EXPECTED_SPLIT_MANIFEST_SHA256,
                 ) = old
 
-    def test_runner_does_not_fabricate_kaggle_environment(self) -> None:
+    def test_control_mount_rejects_incomplete_ratification(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in (
+                "s2_kaggle_driver.py",
+                "PREREGISTRATION.md",
+                "batteryml-protocol-generalization-split-manifest.csv",
+            ):
+                (root / name).write_text(name + "\n")
+            receipt = root / "ratification-receipt.txt"
+            receipt.write_text("status=RATIFIED\n")
+            old = (
+                RUNNER.EXPECTED_DRIVER_SHA256,
+                RUNNER.EXPECTED_PREREG_SHA256,
+                RUNNER.EXPECTED_SPLIT_MANIFEST_SHA256,
+            )
+            try:
+                RUNNER.EXPECTED_DRIVER_SHA256 = RUNNER.sha256_file(root / "s2_kaggle_driver.py")
+                RUNNER.EXPECTED_PREREG_SHA256 = RUNNER.sha256_file(root / "PREREGISTRATION.md")
+                RUNNER.EXPECTED_SPLIT_MANIFEST_SHA256 = RUNNER.sha256_file(
+                    root / "batteryml-protocol-generalization-split-manifest.csv"
+                )
+                with self.assertRaisesRegex(RuntimeError, "receipt instance"):
+                    RUNNER.validate_control_mount(root, receipt)
+            finally:
+                (
+                    RUNNER.EXPECTED_DRIVER_SHA256,
+                    RUNNER.EXPECTED_PREREG_SHA256,
+                    RUNNER.EXPECTED_SPLIT_MANIFEST_SHA256,
+                ) = old
+
+    def test_runner_has_no_precreated_sidecar_dependency_or_fake_identity(self) -> None:
         source = RUNNER_PATH.read_text()
+        self.assertNotIn("execution-authorization.json", source)
+        self.assertNotIn("control-dataset-version.json", source)
+        self.assertNotIn("Path(__file__).resolve().with_name", source)
         self.assertNotIn('os.environ["KAGGLE_KERNEL_RUN_TYPE"]', source)
         self.assertNotIn('os.environ["KAGGLE_URL"]', source)
         self.assertNotIn("batteryml-s2-1-execution-run/1", source)
+        self.assertIn("POST_RUN_API_BINDING_PENDING", RUNNER.KERNEL_ID_PENDING)
 
 
 if __name__ == "__main__":
