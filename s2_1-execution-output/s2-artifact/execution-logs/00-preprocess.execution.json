@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/usr/bin/python3",
+    "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls/s2_kaggle_driver.py",
+    "preprocess-one",
+    "--ratification-receipt",
+    "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls/ratification-receipt.txt"
+  ],
+  "end_utc": "2026-09-16T21:55:35.686535+00:00",
+  "exit_code": 0,
+  "start_utc": "2026-09-16T21:49:51.578135+00:00"
+}

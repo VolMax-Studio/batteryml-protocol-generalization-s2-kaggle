@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/usr/bin/python3",
+    "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls/s2_kaggle_driver.py",
+    "run-one",
+    "--ratification-receipt",
+    "/kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls/ratification-receipt.txt",
+    "--universe",
+    "sensitivity84",
+    "--split",
+    "b",
+    "--model",
+    "ridge"
+  ],
+  "end_utc": "2026-09-16T22:04:34.260960+00:00",
+  "exit_code": 0,
+  "start_utc": "2026-09-16T22:03:44.722114+00:00"
+}

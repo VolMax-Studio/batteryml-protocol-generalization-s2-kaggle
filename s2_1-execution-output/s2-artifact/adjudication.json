@@ -1,0 +1,117 @@
+{
+  "adjudication": "SIGNAL_POSITIVE_MODEL_GATE",
+  "automatic_neural_continuation": false,
+  "cross_environment_relative_tolerance": 0.01,
+  "primary": {
+    "ridge": {
+      "a": {
+        "mae": 80.41317415887194,
+        "rmse": 115.78919623655567
+      },
+      "b": {
+        "mae": 83.30479497681773,
+        "rmse": 138.50330213051572
+      }
+    },
+    "variance": {
+      "a": {
+        "mae": 109.06492614746094,
+        "rmse": 136.12960815429688
+      },
+      "b": {
+        "mae": 109.73089599609375,
+        "rmse": 133.47593688964844
+      }
+    },
+    "xgb": {
+      "a": {
+        "mae": 155.50146484375,
+        "rmse": 333.66455078125
+      },
+      "b": {
+        "mae": 212.07666015625,
+        "rmse": 345.9460754394531
+      }
+    }
+  },
+  "relative_rmse_change": {
+    "ridge": 0.1961677482202697,
+    "variance": -0.01949371118177773,
+    "xgb": 0.036807999619518694
+  },
+  "rmse_order_a_best_to_worst": [
+    "ridge",
+    "variance",
+    "xgb"
+  ],
+  "rmse_order_b_best_to_worst": [
+    "variance",
+    "ridge",
+    "xgb"
+  ],
+  "s1_divergences": {
+    "primary83_ridge_a": {
+      "relative_diff": 1.2212365535354375e-07,
+      "s1_rmse": 115.7891820959575,
+      "s2_rmse": 115.78919623655567,
+      "within_tolerance": true
+    },
+    "primary83_variance_a": {
+      "relative_diff": 1.1209014379035736e-07,
+      "s1_rmse": 136.12962341308594,
+      "s2_rmse": 136.12960815429688,
+      "within_tolerance": true
+    },
+    "primary83_variance_b": {
+      "relative_diff": 0.0,
+      "s1_rmse": 133.47593688964844,
+      "s2_rmse": 133.47593688964844,
+      "within_tolerance": true
+    }
+  },
+  "sensitivity": {
+    "ridge": {
+      "a": {
+        "mae": 143.50258917132325,
+        "rmse": 441.0713742568869
+      },
+      "b": {
+        "mae": 104.61978288869814,
+        "rmse": 157.59660363586622
+      }
+    },
+    "variance": {
+      "a": {
+        "mae": 109.45361328125,
+        "rmse": 135.89784240722656
+      },
+      "b": {
+        "mae": 118.65068817138672,
+        "rmse": 179.26870727539062
+      }
+    },
+    "xgb": {
+      "a": {
+        "mae": 159.57147216796875,
+        "rmse": 333.591552734375
+      },
+      "b": {
+        "mae": 185.18894958496094,
+        "rmse": 319.0354309082031
+      }
+    }
+  },
+  "status": "ADJUDICATED",
+  "timestamp_utc": "2026-09-16T22:06:37.070026+00:00",
+  "trigger_3_status": "pre-exposed / no independent confirmatory weight (Variance B < Variance A in S1)",
+  "trigger_exposure_classification": {
+    "all_three_strictly_worse_under_b": "pre_exposed_no_independent_confirmatory_weight",
+    "any_relative_rmse_change_ge_10_percent": "partially_exposed_decision_weight_on_unverified_models",
+    "rmse_model_order_changed": "partially_exposed_decision_weight_on_unverified_models"
+  },
+  "triggers": {
+    "all_three_strictly_worse_under_b": false,
+    "any_relative_rmse_change_ge_10_percent": true,
+    "rmse_model_order_changed": true
+  }
+}

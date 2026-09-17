@@ -1,0 +1,1 @@
+/usr/bin/python3 /kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls/s2_kaggle_driver.py run-one --ratification-receipt /kaggle/input/datasets/volmax1/batteryml-protocol-generalization-s2-controls/ratification-receipt.txt --universe primary83 --split a --model variance

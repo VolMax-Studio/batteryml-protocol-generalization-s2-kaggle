@@ -1,0 +1,8 @@
+{
+  "adjudication": "SIGNAL_POSITIVE_MODEL_GATE",
+  "artifact_manifest_sha256": "f7d0b960a567ab472c9e22567e4f5dbb9f14716ecba726b5880248482980395b",
+  "attempt": 1,
+  "instance": "batteryml-protocol-generalization-s2.1-kaggle",
+  "status": "COMPLETE",
+  "timestamp_utc": "2026-09-16T22:06:37.092944+00:00"
+}

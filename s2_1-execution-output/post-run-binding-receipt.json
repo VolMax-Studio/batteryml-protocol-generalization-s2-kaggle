@@ -1,0 +1,359 @@
+{
+  "adjudication_summary": {
+    "adjudication": "SIGNAL_POSITIVE_MODEL_GATE",
+    "attempt": 1,
+    "disposition": "GOVERNING_COMPLETE",
+    "primary": {
+      "ridge": {
+        "a": {
+          "mae": 80.41317415887194,
+          "rmse": 115.78919623655567
+        },
+        "b": {
+          "mae": 83.30479497681773,
+          "rmse": 138.50330213051572
+        }
+      },
+      "variance": {
+        "a": {
+          "mae": 109.06492614746094,
+          "rmse": 136.12960815429688
+        },
+        "b": {
+          "mae": 109.73089599609375,
+          "rmse": 133.47593688964844
+        }
+      },
+      "xgb": {
+        "a": {
+          "mae": 155.50146484375,
+          "rmse": 333.66455078125
+        },
+        "b": {
+          "mae": 212.07666015625,
+          "rmse": 345.9460754394531
+        }
+      }
+    },
+    "relative_rmse_change": {
+      "ridge": 0.1961677482202697,
+      "variance": -0.01949371118177773,
+      "xgb": 0.036807999619518694
+    },
+    "sensitivity": {
+      "ridge": {
+        "a": {
+          "mae": 143.50258917132325,
+          "rmse": 441.0713742568869
+        },
+        "b": {
+          "mae": 104.61978288869814,
+          "rmse": 157.59660363586622
+        }
+      },
+      "variance": {
+        "a": {
+          "mae": 109.45361328125,
+          "rmse": 135.89784240722656
+        },
+        "b": {
+          "mae": 118.65068817138672,
+          "rmse": 179.26870727539062
+        }
+      },
+      "xgb": {
+        "a": {
+          "mae": 159.57147216796875,
+          "rmse": 333.591552734375
+        },
+        "b": {
+          "mae": 185.18894958496094,
+          "rmse": 319.0354309082031
+        }
+      }
+    },
+    "trigger_exposure_classification": {
+      "all_three_strictly_worse_under_b": "pre_exposed_no_independent_confirmatory_weight",
+      "any_relative_rmse_change_ge_10_percent": "partially_exposed_decision_weight_on_unverified_models",
+      "rmse_model_order_changed": "partially_exposed_decision_weight_on_unverified_models"
+    },
+    "triggers": {
+      "all_three_strictly_worse_under_b": false,
+      "any_relative_rmse_change_ge_10_percent": true,
+      "rmse_model_order_changed": true
+    }
+  },
+  "closure_step_scientific_run_executed": false,
+  "control_dataset_binding": {
+    "candidate_versions": [
+      {
+        "archive_sha256": "890bf443a75bc7b9ae16620e4ca3df1f6f78b38db766ca57106c8e3e53b68919",
+        "file_count": 211,
+        "listing_bytes": 24089,
+        "listing_sha256": "2df3cd13a55f186868f0c8675c0586281c03e99e2992b9c2990a070e78ca07c8",
+        "runtime_byte_match": false,
+        "version": 1
+      },
+      {
+        "archive_sha256": "df34be2e0d71d3a2b232e2c46930e4e70ab825c8a5181deb39f9437ac432459f",
+        "file_count": 219,
+        "listing_bytes": 24823,
+        "listing_sha256": "c7270b14fb7fc784b8c6b787d4dbca0be77495042400ad2190d0398d87605acd",
+        "runtime_byte_match": false,
+        "version": 2
+      },
+      {
+        "archive_sha256": "f596fbdbb950c990be8c92666dc3959a6e21389250bca787fd675644c3313839",
+        "file_count": 14,
+        "listing_bytes": 1288,
+        "listing_sha256": "f1bbfd24dd74721b43182e8d0e9e6baf90095c5f28020bfd2052b979ffc2470b",
+        "runtime_byte_match": false,
+        "version": 3
+      },
+      {
+        "archive_sha256": "5b9a1b1bfb8a0fcaed974e15b27bbc5455e028fc2753822cee2fc22a0383bd22",
+        "file_count": 221,
+        "listing_bytes": 24991,
+        "listing_sha256": "caf559e79582134d581e0f88aad7805e5c4946264d495306d3c55ebff11fd5ac",
+        "runtime_byte_match": false,
+        "version": 4
+      },
+      {
+        "archive_sha256": "45267eafcb671b6df9bc38dc19c71db89e034de6cdb737ae894a5f241287a81d",
+        "file_count": 222,
+        "listing_bytes": 25081,
+        "listing_sha256": "f66cfe7521ac885d4565c099c3e765d521aecc1e325a15d7bd5c7e333c339b8d",
+        "runtime_byte_match": false,
+        "version": 5
+      },
+      {
+        "archive_sha256": "85a7d2ba9f08ffe281b9e26847e8e546d604543d7b3d9407e82c00a35079878d",
+        "file_count": 223,
+        "listing_bytes": 25157,
+        "listing_sha256": "19db44b8169f7ca7e7245b740828ef7e6bb6a977d3d663a2b9e33a60b13ac6bc",
+        "runtime_byte_match": false,
+        "version": 6
+      },
+      {
+        "archive_sha256": "4db224463d943ce6777311a433bf7440c36d82e2f7468759478af547663fd751",
+        "file_count": 223,
+        "listing_bytes": 25157,
+        "listing_sha256": "1fd46b85d24f3b0b64083fda9593ccf36db4fb1ae2b0bbf0966d5633ac5acc3e",
+        "runtime_byte_match": false,
+        "version": 7
+      },
+      {
+        "archive_sha256": "ff062118610d3d4d54c5cc895f985c6a73f59344e8fe0e384e619485ee8fe8cf",
+        "file_count": 223,
+        "listing_bytes": 25157,
+        "listing_sha256": "049963f1f24225a2452c8fc77476af4bc9baa05b0e2dce1f3df14ca45d129b20",
+        "runtime_byte_match": true,
+        "version": 8
+      }
+    ],
+    "configured_slug": "volmax1/batteryml-protocol-generalization-s2-controls",
+    "matching_versions": [
+      8
+    ],
+    "runtime_file_count": 223,
+    "runtime_listing_bytes": 25157,
+    "runtime_listing_sha256": "049963f1f24225a2452c8fc77476af4bc9baa05b0e2dce1f3df14ca45d129b20"
+  },
+  "generated_at_utc": "2026-09-17T14:40:59.834453+00:00",
+  "generator_sha256": "1ba622b42b12effcfba0ba0400498ef2e1a74ab5426c5b0e92c165a93af81145",
+  "governing_hashes": {
+    "attempt_policy_sha256": "d84b322a9d45806166068c41b41f4f5c1d3a4c0cceed594b68d2275b2ec7d20d",
+    "driver_sha256": "c943e1d52478bbec578ec1d06dcbc84b627f33f3e73e3edd18a38c43dbfc65b9",
+    "preregistration_sha256": "6b027e7426a51caae616b4721bddbe4b62f368e4d17ae659de0399c7b215d92f",
+    "ratification_receipt_sha256": "ef9f192bc0f788717359387512f0b4a9352d9224ec934176e514e6a55a2bc04f",
+    "runner_sha256": "fd74df3b17b2ea082041ca50d35b0c8a6015df7f8c87f4f502f4a472340d939a",
+    "split_manifest_sha256": "96695e534718733469ba108ee3c1372e29351710235d5b47020f6bd9ae2ce722"
+  },
+  "kernel_binding": {
+    "configured_ref": "volmax1/batteryml-s2-1-execution-run",
+    "current_version_number": 1,
+    "dataset_data_sources": [
+      "rickandjoe/mit-battery-degradation-dataset",
+      "volmax1/batteryml-protocol-generalization-s2-controls"
+    ],
+    "docker_image": "gcr.io/kaggle-images/python@sha256:dafd4ce5668bbf1ad422e4c109e0f18c9623c3a7c7f48b0235f13142755c40b9",
+    "enable_gpu": false,
+    "enable_internet": false,
+    "kernel_id": 134653435,
+    "last_run_time": "2026-09-14 14:40:59.304000",
+    "status": "COMPLETE"
+  },
+  "output_file_hashes": {
+    "adjudication_sha256": "3141f701ff99d3b208f56aeb7e6d3e32ef2e800e311802118062ee6dc0f80e20",
+    "artifact_manifest_sha256": "f7d0b960a567ab472c9e22567e4f5dbb9f14716ecba726b5880248482980395b",
+    "attempt_ledger_sha256": "67633d191a487c5091b0250f5123525e1bd3f94d6559bc3f0363e182bf792928",
+    "checkpoint_manifest_sha256": "15c3381f01d43f8001e742d8562f6d3390141601597d1c8e06a9ee3b506438a5",
+    "completion_receipt_sha256": "fcad9aee5f304158b7f60ed62c4ef26da7e6e2840d2bf3369565e8dff533aee0",
+    "control_dataset_files_listing_sha256": "049963f1f24225a2452c8fc77476af4bc9baa05b0e2dce1f3df14ca45d129b20",
+    "execution_closure_sha256": "f92b02908e298bbf5f22735a0d14e61c17a03db12f0e24569c5b739bc98d4c12",
+    "execution_report_sha256": "d042c7220ffcfa3ddf6f98af6cffcc778b67af1b5a274e5db83c5b559d04b2d8",
+    "public_evidence_manifest_sha256": "fd014d249fec5996ec280c46022bf1163b9ccaf9b47445144c607c2460dce55f"
+  },
+  "run_matrix": [
+    {
+      "mae": 109.06492614746094,
+      "model": "variance",
+      "parameters_sha256": "e9ec5d0e916a04b2b9e9f38c1a99b25cdcab0f8138ee867d8e9e4e705d071a07",
+      "predictions_sha256": "4a60067242631184bad21f56f1a7cb2bc9de1278fd43baa89dad83a39a5992fe",
+      "rmse": 136.12960815429688,
+      "run_receipt_sha256": "f6aaeb6107c8ee73a835148610dac0aceab115bbbbb1ae5e21fe7e55796a84c3",
+      "seed": 0,
+      "split": "a",
+      "test_count": 42,
+      "train_count": 41,
+      "universe": "primary83"
+    },
+    {
+      "mae": 80.41317415887194,
+      "model": "ridge",
+      "parameters_sha256": "28db9fcbc782f59387527541e647e9da48e0abe53a178bb05fc07a432ec99ce8",
+      "predictions_sha256": "a90be8ed3271775abf77c866378daca46ff37444f84a1e69299e55af658f1224",
+      "rmse": 115.78919623655567,
+      "run_receipt_sha256": "6b382be070703d12b5a2ec096f006f99ff06c92119723b3bfd0f9e4cb707255f",
+      "seed": 0,
+      "split": "a",
+      "test_count": 42,
+      "train_count": 41,
+      "universe": "primary83"
+    },
+    {
+      "mae": 155.50146484375,
+      "model": "xgb",
+      "parameters_sha256": "10ebd15bf2d1448b36f7be1ee8da48bca2a97b321238198bba6e5a0897c2e65d",
+      "predictions_sha256": "0e69574ce514a3ee5f0c1b7b6fd009892653f6f64b125287fbfc8c997ab7e947",
+      "rmse": 333.66455078125,
+      "run_receipt_sha256": "0205c38ff124159e48ac8366eb7400d60e68b3c7b667d0f37f95f8c9eeb39e67",
+      "seed": 0,
+      "split": "a",
+      "test_count": 42,
+      "train_count": 41,
+      "universe": "primary83"
+    },
+    {
+      "mae": 109.73089599609375,
+      "model": "variance",
+      "parameters_sha256": "e9ec5d0e916a04b2b9e9f38c1a99b25cdcab0f8138ee867d8e9e4e705d071a07",
+      "predictions_sha256": "ec87a5adab076703fc2e7a93ff67932b11ac84f78edb4133bb243e2be10da35f",
+      "rmse": 133.47593688964844,
+      "run_receipt_sha256": "dbcb31069b537ab40933b80d86c5567d43fce7a073e4328dd1b30470a4d2396b",
+      "seed": 0,
+      "split": "b",
+      "test_count": 42,
+      "train_count": 41,
+      "universe": "primary83"
+    },
+    {
+      "mae": 83.30479497681773,
+      "model": "ridge",
+      "parameters_sha256": "28db9fcbc782f59387527541e647e9da48e0abe53a178bb05fc07a432ec99ce8",
+      "predictions_sha256": "f6210e254f6f0c1c5353cff12ac827d0f5aa7a5447f67867a5daee52a2a5628a",
+      "rmse": 138.50330213051572,
+      "run_receipt_sha256": "f43b12cfb05930850a3f4a60f0c70afa705e5e2c5b6e0af603668e4d41cea54e",
+      "seed": 0,
+      "split": "b",
+      "test_count": 42,
+      "train_count": 41,
+      "universe": "primary83"
+    },
+    {
+      "mae": 212.07666015625,
+      "model": "xgb",
+      "parameters_sha256": "10ebd15bf2d1448b36f7be1ee8da48bca2a97b321238198bba6e5a0897c2e65d",
+      "predictions_sha256": "9aaed2359fc96b3acefc93bcda641c71b4e3a0d327b81c97a24af845f90e1f72",
+      "rmse": 345.9460754394531,
+      "run_receipt_sha256": "1b085bf707b182042db7e8fd8b02192aef8af91c23269b02972ba389eb656870",
+      "seed": 0,
+      "split": "b",
+      "test_count": 42,
+      "train_count": 41,
+      "universe": "primary83"
+    },
+    {
+      "mae": 109.45361328125,
+      "model": "variance",
+      "parameters_sha256": "e9ec5d0e916a04b2b9e9f38c1a99b25cdcab0f8138ee867d8e9e4e705d071a07",
+      "predictions_sha256": "9f7d63cce6948da09450c835645d47fc16f48b0e146fbb1f64d2bc4188a0907a",
+      "rmse": 135.89784240722656,
+      "run_receipt_sha256": "fb40ff86f997a0567996ab55d94c178c5e164d1ade5c2f91752eb0fb10d3fa2b",
+      "seed": 0,
+      "split": "a",
+      "test_count": 43,
+      "train_count": 41,
+      "universe": "sensitivity84"
+    },
+    {
+      "mae": 143.50258917132325,
+      "model": "ridge",
+      "parameters_sha256": "28db9fcbc782f59387527541e647e9da48e0abe53a178bb05fc07a432ec99ce8",
+      "predictions_sha256": "b9dc48998171829245dc4c8ac316297a5768d9c4555d1012e33afa1581e409ce",
+      "rmse": 441.0713742568869,
+      "run_receipt_sha256": "25b26a32b06c9993976379965233e8aea54de27642c83abb6cb12c82d6acb9de",
+      "seed": 0,
+      "split": "a",
+      "test_count": 43,
+      "train_count": 41,
+      "universe": "sensitivity84"
+    },
+    {
+      "mae": 159.57147216796875,
+      "model": "xgb",
+      "parameters_sha256": "10ebd15bf2d1448b36f7be1ee8da48bca2a97b321238198bba6e5a0897c2e65d",
+      "predictions_sha256": "afceb5de247052df165d31a806ac72f16a93496b66fe54710e146706e35ee93b",
+      "rmse": 333.591552734375,
+      "run_receipt_sha256": "8a9079696d13e742f2e99c0ab668217ce76dc522b8b9be3af84959cf3875270b",
+      "seed": 0,
+      "split": "a",
+      "test_count": 43,
+      "train_count": 41,
+      "universe": "sensitivity84"
+    },
+    {
+      "mae": 118.65068817138672,
+      "model": "variance",
+      "parameters_sha256": "e9ec5d0e916a04b2b9e9f38c1a99b25cdcab0f8138ee867d8e9e4e705d071a07",
+      "predictions_sha256": "4a31434a76bdcda30b641a2b347768a2a00a518f54b23a3ba0226507c776ec57",
+      "rmse": 179.26870727539062,
+      "run_receipt_sha256": "851b6966909ccf90e80806d72f129da3bcdbd8fcfe09a446421ba8ae673f5734",
+      "seed": 0,
+      "split": "b",
+      "test_count": 43,
+      "train_count": 41,
+      "universe": "sensitivity84"
+    },
+    {
+      "mae": 104.61978288869814,
+      "model": "ridge",
+      "parameters_sha256": "28db9fcbc782f59387527541e647e9da48e0abe53a178bb05fc07a432ec99ce8",
+      "predictions_sha256": "4b05ef5f2b9ee0e8f4693eeccdddaf3698ef38da620198f32795959e428945d6",
+      "rmse": 157.59660363586622,
+      "run_receipt_sha256": "02245e447b20f716da55ad90aa2f25c282228688a157d3640b00e7d596e9cc0e",
+      "seed": 0,
+      "split": "b",
+      "test_count": 43,
+      "train_count": 41,
+      "universe": "sensitivity84"
+    },
+    {
+      "mae": 185.18894958496094,
+      "model": "xgb",
+      "parameters_sha256": "10ebd15bf2d1448b36f7be1ee8da48bca2a97b321238198bba6e5a0897c2e65d",
+      "predictions_sha256": "58340f2f4c5707ec6f61ef3f0d6c9d0dfc25e8a5d1088d4a6951653ee52961ca",
+      "rmse": 319.0354309082031,
+      "run_receipt_sha256": "622a0678ba520f4764c906aafdfadf727c6470ec53e53974f07a4dcf6fbc6dc3",
+      "seed": 0,
+      "split": "b",
+      "test_count": 43,
+      "train_count": 41,
+      "universe": "sensitivity84"
+    }
+  ],
+  "run_matrix_count": 12,
+  "scientific_run_executed_in_bound_attempt": true,
+  "status": "POST_RUN_BINDING_COMPLETE_GENERATED",
+  "study_instance": "batteryml-protocol-generalization-s2.1-kaggle"
+}

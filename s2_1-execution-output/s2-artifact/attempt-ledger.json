@@ -1,0 +1,16 @@
+{
+  "attempt_number": 1,
+  "disposition": "GOVERNING_COMPLETE",
+  "end_utc": "2026-09-16T22:06:37.093127+00:00",
+  "exit_code": 0,
+  "generated_receipts": [
+    "execution-closure.json",
+    "adjudication.json",
+    "completion-receipt.json",
+    "artifact-files.sha256"
+  ],
+  "governing_driver_sha256": "c943e1d52478bbec578ec1d06dcbc84b627f33f3e73e3edd18a38c43dbfc65b9",
+  "governing_prereg_sha256": "6b027e7426a51caae616b4721bddbe4b62f368e4d17ae659de0399c7b215d92f",
+  "kaggle_kernel_run_id_or_url": "volmax1/batteryml-s2-1-execution-run/POST_RUN_API_BINDING_PENDING (https://www.kaggle.com/code/volmax1/batteryml-s2-1-execution-run)",
+  "start_utc": "2026-09-16T21:49:50.274467+00:00"
+}
